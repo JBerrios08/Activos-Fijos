@@ -119,34 +119,37 @@ public class FormularioLogin extends JFrame {
     }
 
     private void iniciarSesion() {
-        String usuario = campoUsuario.getText().trim();
+        String nombreUsuario = campoUsuario.getText().trim();
         String clave = new String(campoClave.getPassword()).trim();
 
-        if (usuario.isEmpty() || clave.isEmpty()) {
+        if (nombreUsuario.isEmpty() || clave.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Complete usuario y clave.", "Validación", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        String sql = "SELECT rol FROM usuarios WHERE nombre = ? AND clave = ?";
+        String sql = "SELECT * FROM usuarios WHERE nombre_usuario = ? AND clave = ?";
 
-        try (Connection conexion = ConexionBaseDatos.obtenerConexion();
-             PreparedStatement ps = conexion.prepareStatement(sql)) {
+        try (Connection conexion = ConexionBaseDatos.obtenerConexion()) {
+            System.out.println("Conexión a MySQL exitosa para inicio de sesión.");
 
-            ps.setString(1, usuario);
-            ps.setString(2, clave);
+            try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+                ps.setString(1, nombreUsuario);
+                ps.setString(2, clave);
 
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    String rol = rs.getString("rol");
-                    SwingUtilities.invokeLater(() -> {
-                        new MenuPrincipal(usuario, rol).setVisible(true);
-                        dispose();
-                    });
-                } else {
-                    JOptionPane.showMessageDialog(this, "Credenciales incorrectas.", "Acceso denegado", JOptionPane.ERROR_MESSAGE);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        String rol = rs.getString("rol");
+                        SwingUtilities.invokeLater(() -> {
+                            new MenuPrincipal(nombreUsuario, rol).setVisible(true);
+                            dispose();
+                        });
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Credenciales incorrectas.", "Acceso denegado", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             }
         } catch (Exception ex) {
+            System.out.println("Falló la conexión o consulta de inicio de sesión: " + ex.getMessage());
             JOptionPane.showMessageDialog(this, "Error de conexión: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
