@@ -22,4 +22,16 @@ public class EstadosServicio {
         }
         return estados;
     }
+
+    public boolean noHayActivosRegistrados() {
+        String sql = "SELECT COUNT(*) total FROM activos";
+        try (Connection conn = ConexionBaseDatos.obtenerConexion(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("total") == 0;
+            }
+            return true;
+        } catch (Exception ex) {
+            throw new RuntimeException("No fue posible validar activos registrados: " + ex.getMessage(), ex);
+        }
+    }
 }
