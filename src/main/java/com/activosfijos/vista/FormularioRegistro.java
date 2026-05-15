@@ -1,6 +1,7 @@
 package com.activosfijos.vista;
 
 import com.activosfijos.util.ConexionBaseDatos;
+import com.activosfijos.util.TemaVisual;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -12,10 +13,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class FormularioRegistro extends JFrame {
-
-    private static final Color AZUL_MEDIANOCHE = Color.decode("#2C3E50");
-    private static final Color BLANCO_NIEVE = Color.decode("#ECF0F1");
-    private static final Color AZUL_ELECTRICO = Color.decode("#3498DB");
 
     private final JTextField campoNombreUsuario;
     private final JPasswordField campoClave;
@@ -31,7 +28,6 @@ public class FormularioRegistro extends JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBackground(BLANCO_NIEVE);
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -39,7 +35,7 @@ public class FormularioRegistro extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         JLabel titulo = new JLabel("Crear nueva cuenta");
-        titulo.setForeground(AZUL_MEDIANOCHE);
+        titulo.setForeground(TemaVisual.AZUL_INSTITUCIONAL);
         titulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
 
         campoNombreUsuario = new JTextField(20);
@@ -47,8 +43,8 @@ public class FormularioRegistro extends JFrame {
         comboRol = new JComboBox<>(new String[]{"operador", "administrador"});
 
         JButton botonRegistrar = new JButton("Registrar", FontIcon.of(FontAwesomeSolid.USER_PLUS, 14, Color.WHITE));
-        botonRegistrar.setBackground(AZUL_ELECTRICO);
-        botonRegistrar.setForeground(Color.WHITE);
+        botonRegistrar.setBackground(UIManager.getColor("Button.default.background"));
+        botonRegistrar.setForeground(UIManager.getColor("Button.default.foreground"));
         botonRegistrar.setFocusPainted(false);
         botonRegistrar.addActionListener(e -> registrarUsuario());
 

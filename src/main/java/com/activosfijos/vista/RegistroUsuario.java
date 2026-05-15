@@ -1,6 +1,7 @@
 package com.activosfijos.vista;
 
 import com.activosfijos.util.ConexionBaseDatos;
+import com.activosfijos.util.TemaVisual;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -10,10 +11,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class RegistroUsuario extends JFrame {
-
-    private static final Color AZUL_MEDIANOCHE = Color.decode("#2C3E50");
-    private static final Color BLANCO_NIEVE = Color.decode("#ECF0F1");
-    private static final Color AZUL_ELECTRICO = Color.decode("#3498DB");
 
     private final JTextField campoNombre;
     private final JPasswordField campoClave;
@@ -26,7 +23,6 @@ public class RegistroUsuario extends JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBackground(BLANCO_NIEVE);
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -34,7 +30,7 @@ public class RegistroUsuario extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         JLabel titulo = new JLabel("Crear nuevo usuario");
-        titulo.setForeground(AZUL_MEDIANOCHE);
+        titulo.setForeground(TemaVisual.AZUL_INSTITUCIONAL);
         titulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
 
         campoNombre = new JTextField(20);
@@ -42,8 +38,8 @@ public class RegistroUsuario extends JFrame {
         comboRol = new JComboBox<>(new String[]{"operador", "administrador"});
 
         JButton botonRegistrar = new JButton("Registrar");
-        botonRegistrar.setBackground(AZUL_ELECTRICO);
-        botonRegistrar.setForeground(Color.WHITE);
+        botonRegistrar.setBackground(UIManager.getColor("Button.default.background"));
+        botonRegistrar.setForeground(UIManager.getColor("Button.default.foreground"));
         botonRegistrar.setFocusPainted(false);
         botonRegistrar.addActionListener(e -> registrarUsuario());
 
