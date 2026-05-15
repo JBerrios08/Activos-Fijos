@@ -1,12 +1,19 @@
 package com.activosfijos.vista;
 
+import com.activosfijos.util.ConexionBaseDatos;
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.swing.FontIcon;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
-import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Formulario base para administración de activos.
@@ -19,6 +26,11 @@ public class GestionActivos extends JFrame {
 
     private JTextField campoCodigoBarra;
     private JTextField campoNombre;
+    private JTextField campoDescripcion;
+    private JTextField campoSerie;
+    private JTextField campoValorCompra;
+    private JComboBox<String> comboEstado;
+    private DefaultTableModel modeloTabla;
     private Border bordeCodigoOriginal;
     private Border bordeNombreOriginal;
 
@@ -50,33 +62,29 @@ public class GestionActivos extends JFrame {
         gbc.insets = new Insets(8, 8, 8, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        String[] etiquetas = {"Código de Barra", "Nombre", "Descripción", "Serie", "Valor de Compra", "Estado"};
+        campoCodigoBarra = new JTextField();
+        campoNombre = new JTextField();
+        campoDescripcion = new JTextField();
+        campoSerie = new JTextField();
+        campoValorCompra = new JTextField();
+        comboEstado = new JComboBox<>(new String[]{"Disponible", "Asignado", "Mantenimiento", "Baja"});
 
-        for (int i = 0; i < etiquetas.length; i++) {
-            JLabel lbl = new JLabel(etiquetas[i]);
-            lbl.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        campoCodigoBarra.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        campoNombre.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        campoDescripcion.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        campoSerie.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        campoValorCompra.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        comboEstado.setFont(new Font("Segoe UI", Font.PLAIN, 16));
 
-            JTextField txt = new JTextField();
-            txt.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        bordeCodigoOriginal = campoCodigoBarra.getBorder();
+        bordeNombreOriginal = campoNombre.getBorder();
 
-            if ("Código de Barra".equals(etiquetas[i])) {
-                campoCodigoBarra = txt;
-                bordeCodigoOriginal = txt.getBorder();
-            }
-            if ("Nombre".equals(etiquetas[i])) {
-                campoNombre = txt;
-                bordeNombreOriginal = txt.getBorder();
-            }
-
-            gbc.gridx = 0;
-            gbc.gridy = i;
-            gbc.weightx = 0.2;
-            formulario.add(lbl, gbc);
-
-            gbc.gridx = 1;
-            gbc.weightx = 0.8;
-            formulario.add(txt, gbc);
-        }
+        agregarCampo(formulario, gbc, 0, "Código de Barra", campoCodigoBarra);
+        agregarCampo(formulario, gbc, 1, "Nombre", campoNombre);
+        agregarCampo(formulario, gbc, 2, "Descripción", campoDescripcion);
+        agregarCampo(formulario, gbc, 3, "Serie", campoSerie);
+        agregarCampo(formulario, gbc, 4, "Valor de Compra", campoValorCompra);
+        agregarCampo(formulario, gbc, 5, "Estado", comboEstado);
 
         JTable tablaActivos = crearTablaModerna();
         JScrollPane scroll = new JScrollPane(tablaActivos);
@@ -86,9 +94,9 @@ public class GestionActivos extends JFrame {
         acciones.setBackground(BLANCO_NIEVE);
         acciones.setBorder(new EmptyBorder(0, 0, 8, 8));
 
-        JButton botonGuardar = crearBotonAccion("Guardar", cargarIcono("guardar"));
-        JButton botonEliminar = crearBotonAccion("Eliminar", cargarIcono("eliminar"));
-        JButton botonBuscar = crearBotonAccion("Buscar", cargarIcono("buscar"));
+        JButton botonGuardar = crearBotonAccion("Guardar", FontAwesomeSolid.SAVE);
+        JButton botonEliminar = crearBotonAccion("Eliminar", FontAwesomeSolid.TRASH);
+        JButton botonBuscar = crearBotonAccion("Buscar", FontAwesomeSolid.SEARCH);
 
         botonGuardar.addActionListener(e -> guardarActivo());
 
@@ -106,12 +114,33 @@ public class GestionActivos extends JFrame {
         principal.add(acciones, BorderLayout.SOUTH);
 
         setContentPane(principal);
+        cargarActivos();
+    }
+
+    private void agregarCampo(JPanel panel, GridBagConstraints gbc, int fila, String etiqueta, JComponent componente) {
+        JLabel lbl = new JLabel(etiqueta);
+        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+
+        gbc.gridx = 0;
+        gbc.gridy = fila;
+        gbc.weightx = 0.2;
+        panel.add(lbl, gbc);
+
+        gbc.gridx = 1;
+        gbc.weightx = 0.8;
+        panel.add(componente, gbc);
     }
 
     private JTable crearTablaModerna() {
         String[] columnas = {"Código", "Nombre", "Serie", "Estado"};
-        DefaultTableModel modelo = new DefaultTableModel(columnas, 0);
-        JTable tabla = new JTable(modelo);
+        modeloTabla = new DefaultTableModel(columnas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        JTable tabla = new JTable(modeloTabla);
         tabla.setRowHeight(30);
         tabla.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 
@@ -123,23 +152,14 @@ public class GestionActivos extends JFrame {
         return tabla;
     }
 
-    private JButton crearBotonAccion(String texto, Icon icono) {
-        JButton boton = new JButton(texto, icono);
+    private JButton crearBotonAccion(String texto, FontAwesomeSolid icono) {
+        JButton boton = new JButton(texto, FontIcon.of(icono, 14, Color.WHITE));
         boton.setBackground(AZUL_ELECTRICO);
         boton.setForeground(Color.WHITE);
         boton.setFocusPainted(false);
         boton.setFont(new Font("Segoe UI", Font.BOLD, 14));
         boton.setBorder(new RoundedBorder(12));
         return boton;
-    }
-
-    public static Icon cargarIcono(String nombre) {
-        String ruta = "/iconos/" + nombre + ".png";
-        URL recurso = GestionActivos.class.getResource(ruta);
-        if (recurso != null) {
-            return new ImageIcon(recurso);
-        }
-        return new TextIcon("•", 14, AZUL_MEDIANOCHE);
     }
 
     private void guardarActivo() {
@@ -161,7 +181,68 @@ public class GestionActivos extends JFrame {
             return;
         }
 
-        JOptionPane.showMessageDialog(this, "Activo guardado correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        String sql = "INSERT INTO activos (codigo_barra, nombre, descripcion, serie, valor_compra, estado) VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (Connection conexion = ConexionBaseDatos.obtenerConexion();
+             PreparedStatement ps = conexion.prepareStatement(sql)) {
+
+            ps.setString(1, campoCodigoBarra.getText().trim());
+            ps.setString(2, campoNombre.getText().trim());
+            ps.setString(3, campoDescripcion.getText().trim());
+            ps.setString(4, campoSerie.getText().trim());
+
+            String valorTexto = campoValorCompra.getText().trim();
+            if (valorTexto.isEmpty()) {
+                ps.setBigDecimal(5, null);
+            } else {
+                ps.setBigDecimal(5, new java.math.BigDecimal(valorTexto));
+            }
+
+            ps.setString(6, (String) comboEstado.getSelectedItem());
+            ps.executeUpdate();
+
+            JOptionPane.showMessageDialog(this, "Activo guardado correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            limpiarFormulario();
+            cargarActivos();
+        } catch (SQLException ex) {
+            System.err.println("Error SQL al guardar activo: " + ex.getMessage());
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "No fue posible guardar el activo.", "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Valor de compra inválido.", "Validación", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void cargarActivos() {
+        modeloTabla.setRowCount(0);
+        String sql = "SELECT codigo_barra, nombre, serie, estado FROM activos ORDER BY id_activo DESC";
+
+        try (Connection conexion = ConexionBaseDatos.obtenerConexion();
+             PreparedStatement ps = conexion.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Object[] fila = {
+                        rs.getString("codigo_barra"),
+                        rs.getString("nombre"),
+                        rs.getString("serie"),
+                        rs.getString("estado")
+                };
+                modeloTabla.addRow(fila);
+            }
+        } catch (SQLException ex) {
+            System.err.println("Error SQL al cargar activos: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
+    private void limpiarFormulario() {
+        campoCodigoBarra.setText("");
+        campoNombre.setText("");
+        campoDescripcion.setText("");
+        campoSerie.setText("");
+        campoValorCompra.setText("");
+        comboEstado.setSelectedIndex(0);
     }
 
     private static class RoundedBorder implements Border {
@@ -186,30 +267,5 @@ public class GestionActivos extends JFrame {
             g.setColor(AZUL_MEDIANOCHE);
             g.drawRoundRect(x, y, width - 1, height - 1, radius, radius);
         }
-    }
-
-    private static class TextIcon implements Icon {
-        private final String text;
-        private final int size;
-        private final Color color;
-
-        private TextIcon(String text, int size, Color color) {
-            this.text = text;
-            this.size = size;
-            this.color = color;
-        }
-
-        @Override
-        public void paintIcon(Component c, Graphics g, int x, int y) {
-            g.setColor(color);
-            g.setFont(new Font("Segoe UI Symbol", Font.BOLD, size));
-            g.drawString(text, x + 3, y + size);
-        }
-
-        @Override
-        public int getIconWidth() { return 16; }
-
-        @Override
-        public int getIconHeight() { return 16; }
     }
 }
