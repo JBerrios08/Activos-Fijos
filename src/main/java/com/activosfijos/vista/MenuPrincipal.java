@@ -2,8 +2,7 @@ package com.activosfijos.vista;
 
 import com.activosfijos.servicio.EstadosServicio;
 import com.activosfijos.servicio.GraficosServicio;
-import com.formdev.flatlaf.FlatDarkLaf;
-import com.formdev.flatlaf.FlatLightLaf;
+import com.activosfijos.util.TemaVisual;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -15,8 +14,6 @@ import java.io.File;
 import java.util.Map;
 
 public class MenuPrincipal extends JFrame {
-    private static final Color AZUL_MEDIANOCHE = Color.decode("#2C3E50");
-    private static final Color AZUL_ELECTRICO = Color.decode("#3498DB");
     private boolean modoOscuro;
     private final EstadosServicio estadosServicio = new EstadosServicio();
     private final GraficosServicio graficosServicio = new GraficosServicio();
@@ -31,7 +28,7 @@ public class MenuPrincipal extends JFrame {
         principal.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         JPanel cabecera = new JPanel(new BorderLayout());
-        cabecera.setBackground(AZUL_MEDIANOCHE);
+        cabecera.setBackground(TemaVisual.AZUL_INSTITUCIONAL);
         cabecera.setBorder(new EmptyBorder(12, 16, 12, 16));
 
         JLabel bienvenida = new JLabel(" Usuario: " + usuario + "  |  Rol: " + rol);
@@ -91,11 +88,7 @@ public class MenuPrincipal extends JFrame {
 
     private void alternarTema() {
         try {
-            if (modoOscuro) {
-                UIManager.setLookAndFeel(new FlatLightLaf());
-            } else {
-                UIManager.setLookAndFeel(new FlatDarkLaf());
-            }
+            TemaVisual.aplicarTema(!modoOscuro);
             modoOscuro = !modoOscuro;
             for (Window ventana : Window.getWindows()) {
                 SwingUtilities.updateComponentTreeUI(ventana);
@@ -122,7 +115,7 @@ public class MenuPrincipal extends JFrame {
         JButton boton = new JButton(texto, FontIcon.of(icono, 14));
         boton.setHorizontalTextPosition(SwingConstants.RIGHT);
         boton.setIconTextGap(8);
-        boton.setBackground(AZUL_ELECTRICO);
+        boton.setBackground(UIManager.getColor("Button.background"));
         boton.setForeground(UIManager.getColor("Button.foreground"));
         boton.setBorder(new RoundedBorder(12));
         return boton;
@@ -132,8 +125,8 @@ public class MenuPrincipal extends JFrame {
         JButton boton = new JButton("Cerrar Sesión", FontIcon.of(FontAwesomeSolid.SIGN_OUT_ALT, 14));
         boton.setHorizontalTextPosition(SwingConstants.RIGHT);
         boton.setIconTextGap(8);
-        boton.setBackground(Color.decode("#E57373"));
-        boton.setForeground(UIManager.getColor("Button.foreground"));
+        boton.setBackground(UIManager.getColor("Button.default.background"));
+        boton.setForeground(UIManager.getColor("Button.default.foreground"));
         boton.setBorder(new RoundedBorder(12));
         return boton;
     }
@@ -158,6 +151,6 @@ public class MenuPrincipal extends JFrame {
         private RoundedBorder(int radius) { this.radius = radius; }
         public Insets getBorderInsets(Component c) { return new Insets(10, 16, 10, 16); }
         public boolean isBorderOpaque() { return false; }
-        public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) { g.setColor(AZUL_MEDIANOCHE); g.drawRoundRect(x, y, width - 1, height - 1, radius, radius); }
+        public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) { g.setColor(TemaVisual.AZUL_INSTITUCIONAL); g.drawRoundRect(x, y, width - 1, height - 1, radius, radius); }
     }
 }

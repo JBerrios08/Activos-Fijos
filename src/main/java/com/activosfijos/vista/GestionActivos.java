@@ -1,6 +1,7 @@
 package com.activosfijos.vista;
 
 import com.activosfijos.servicio.ActivosServicio;
+import com.activosfijos.util.TemaVisual;
 import com.activosfijos.servicio.ReportesServicio;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
@@ -18,9 +19,6 @@ import java.awt.*;
 import java.io.File;
 
 public class GestionActivos extends JFrame {
-
-    private static final Color AZUL_MEDIANOCHE = Color.decode("#2C3E50");
-    private static final Color AZUL_ELECTRICO = Color.decode("#3498DB");
 
     private final ReportesServicio reportesServicio = new ReportesServicio();
     private final ActivosServicio activosServicio = new ActivosServicio();
@@ -48,7 +46,7 @@ public class GestionActivos extends JFrame {
         principal.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         JPanel titulo = new JPanel(new BorderLayout());
-        titulo.setBackground(AZUL_MEDIANOCHE);
+        titulo.setBackground(TemaVisual.AZUL_INSTITUCIONAL);
         titulo.setBorder(new EmptyBorder(12, 16, 12, 16));
         JButton botonRegresar = crearBotonAccion("Regresar", FontAwesomeSolid.ARROW_LEFT);
         botonRegresar.addActionListener(e -> regresarAlMenuPrincipal());
@@ -155,7 +153,7 @@ public class GestionActivos extends JFrame {
         tabla.setRowSorter(sorter);
         tabla.setDefaultRenderer(Object.class, new EstadoRenderer());
         JTableHeader header = tabla.getTableHeader();
-        header.setBackground(AZUL_MEDIANOCHE);
+        header.setBackground(UIManager.getColor("TableHeader.background"));
         header.setForeground(UIManager.getColor("Label.foreground"));
         return tabla;
     }
@@ -203,7 +201,7 @@ public class GestionActivos extends JFrame {
         JButton boton = new JButton(texto, FontIcon.of(icono, 14));
         boton.setHorizontalTextPosition(SwingConstants.RIGHT);
         boton.setIconTextGap(8);
-        boton.setBackground(AZUL_ELECTRICO);
+        boton.setBackground(UIManager.getColor("Button.background"));
         boton.setForeground(UIManager.getColor("Button.foreground"));
         return boton;
     }

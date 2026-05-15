@@ -1,6 +1,7 @@
 package com.activosfijos.vista;
 
 import com.activosfijos.servicio.UsuariosServicio;
+import com.activosfijos.util.TemaVisual;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -9,10 +10,6 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 public class GestionUsuarios extends JFrame {
-
-    private static final Color AZUL_MEDIANOCHE = Color.decode("#2C3E50");
-    private static final Color BLANCO_NIEVE = Color.decode("#ECF0F1");
-    private static final Color AZUL_ELECTRICO = Color.decode("#3498DB");
 
     private JTextField campoUsuario;
     private JPasswordField campoClave;
@@ -26,7 +23,6 @@ public class GestionUsuarios extends JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         JPanel principal = new JPanel(new BorderLayout(12, 12));
-        principal.setBackground(BLANCO_NIEVE);
         principal.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         JPanel encabezado = new JPanel(new BorderLayout());
@@ -35,12 +31,11 @@ public class GestionUsuarios extends JFrame {
         botonRegresar.addActionListener(e -> regresarAlMenuPrincipal());
         JLabel titulo = new JLabel("Administración de Usuarios");
         titulo.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        titulo.setForeground(AZUL_MEDIANOCHE);
+        titulo.setForeground(TemaVisual.AZUL_INSTITUCIONAL);
         encabezado.add(botonRegresar, BorderLayout.WEST);
         encabezado.add(titulo, BorderLayout.CENTER);
 
         JPanel formulario = new JPanel(new GridBagLayout());
-        formulario.setBackground(BLANCO_NIEVE);
         formulario.setBorder(new EmptyBorder(12, 12, 12, 12));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -56,7 +51,6 @@ public class GestionUsuarios extends JFrame {
         agregarCampo(formulario, gbc, 2, "Rol", comboRol);
 
         JPanel acciones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
-        acciones.setBackground(BLANCO_NIEVE);
 
         JButton botonCrear = crearBotonAccion("Crear", FontAwesomeSolid.USER_PLUS);
         JButton botonEditar = crearBotonAccion("Editar", FontAwesomeSolid.SEARCH);
@@ -90,8 +84,8 @@ public class GestionUsuarios extends JFrame {
 
     private JButton crearBotonAccion(String texto, FontAwesomeSolid icono) {
         JButton boton = new JButton(texto, FontIcon.of(icono, 14, Color.WHITE));
-        boton.setBackground(AZUL_ELECTRICO);
-        boton.setForeground(Color.WHITE);
+        boton.setBackground(UIManager.getColor("Button.background"));
+        boton.setForeground(UIManager.getColor("Button.foreground"));
         boton.setFocusPainted(false);
         boton.setBorder(new RoundedBorder(12));
         return boton;
@@ -194,7 +188,7 @@ public class GestionUsuarios extends JFrame {
 
         @Override
         public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
-            g.setColor(AZUL_MEDIANOCHE);
+            g.setColor(TemaVisual.AZUL_INSTITUCIONAL);
             g.drawRoundRect(x, y, width - 1, height - 1, radius, radius);
         }
     }

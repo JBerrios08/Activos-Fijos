@@ -1,5 +1,6 @@
 package com.activosfijos.servicio;
 
+import com.activosfijos.util.TemaVisual;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -14,8 +15,6 @@ import java.util.Map;
 
 public class GraficosServicio {
 
-    private static final Color AZUL_MEDIANOCHE = Color.decode("#2C3E50");
-    private static final Color AZUL_ELECTRICO = Color.decode("#3498DB");
 
     public JPanel crearGraficoEstados(Map<String, Integer> datosEstados, Color colorFondoTema) {
         if (datosEstados == null || datosEstados.isEmpty()) {
@@ -45,17 +44,26 @@ public class GraficosServicio {
         CategoryPlot plot = chart.getCategoryPlot();
         plot.setBackgroundPaint(colorFondoTema);
         plot.setOutlineVisible(false);
-        plot.setRangeGridlinePaint(AZUL_MEDIANOCHE.brighter());
+        plot.setRangeGridlinePaint(UIManager.getColor("Separator.foreground"));
         plot.getDomainAxis().setTickLabelPaint(UIManager.getColor("Label.foreground"));
         plot.getDomainAxis().setLabelPaint(UIManager.getColor("Label.foreground"));
         plot.getRangeAxis().setTickLabelPaint(UIManager.getColor("Label.foreground"));
         plot.getRangeAxis().setLabelPaint(UIManager.getColor("Label.foreground"));
 
         BarRenderer renderer = (BarRenderer) plot.getRenderer();
-        renderer.setSeriesPaint(0, AZUL_ELECTRICO);
+        renderer.setSeriesPaint(0, esTemaOscuro() ? TemaVisual.AZUL_SUAVE : TemaVisual.AZUL_INSTITUCIONAL);
         renderer.setBarPainter(new StandardBarPainter());
         renderer.setShadowVisible(false);
         renderer.setDrawBarOutline(false);
+    }
+
+    private boolean esTemaOscuro() {
+        Color fondo = UIManager.getColor("Panel.background");
+        return fondo != null && brillo(fondo) < 140;
+    }
+
+    private int brillo(Color color) {
+        return (color.getRed() * 299 + color.getGreen() * 587 + color.getBlue() * 114) / 1000;
     }
 
     public JPanel crearPanelSinDatos() {

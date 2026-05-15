@@ -1,7 +1,7 @@
 package com.activosfijos.vista;
 
 import com.activosfijos.servicio.AutenticacionServicio;
-import com.formdev.flatlaf.FlatLightLaf;
+import com.activosfijos.util.TemaVisual;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -11,9 +11,6 @@ import java.awt.*;
 
 public class FormularioLogin extends JFrame {
 
-    private static final Color AZUL_MEDIANOCHE = Color.decode("#2C3E50");
-    private static final Color BLANCO_NIEVE = Color.decode("#ECF0F1");
-    private static final Color AZUL_ELECTRICO = Color.decode("#3498DB");
 
     private final JTextField campoUsuario;
     private final JPasswordField campoClave;
@@ -27,30 +24,27 @@ public class FormularioLogin extends JFrame {
         setResizable(false);
 
         JPanel contenedor = new JPanel(new BorderLayout());
-        contenedor.setBackground(BLANCO_NIEVE);
 
         JPanel barraLateral = new JPanel();
-        barraLateral.setBackground(AZUL_MEDIANOCHE);
+        barraLateral.setBackground(TemaVisual.AZUL_INSTITUCIONAL);
         barraLateral.setPreferredSize(new Dimension(280, 650));
         barraLateral.setLayout(new BoxLayout(barraLateral, BoxLayout.Y_AXIS));
         barraLateral.setBorder(new EmptyBorder(80, 24, 24, 24));
 
         JLabel etiquetaSistema = new JLabel("ACTIVOS-FIJOS");
         etiquetaSistema.setFont(new Font("Segoe UI", Font.BOLD, 30));
-        etiquetaSistema.setForeground(BLANCO_NIEVE);
+        etiquetaSistema.setForeground(TemaVisual.GRIS_CLARO);
         JLabel etiquetaSub = new JLabel("Control moderno de inventario");
         etiquetaSub.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        etiquetaSub.setForeground(BLANCO_NIEVE);
+        etiquetaSub.setForeground(TemaVisual.GRIS_CLARO);
 
         barraLateral.add(etiquetaSistema);
         barraLateral.add(Box.createVerticalStrut(10));
         barraLateral.add(etiquetaSub);
 
         JPanel panelLogin = new JPanel(new GridBagLayout());
-        panelLogin.setBackground(BLANCO_NIEVE);
 
         JPanel formulario = new JPanel(new GridBagLayout());
-        formulario.setBackground(BLANCO_NIEVE);
         formulario.setBorder(new EmptyBorder(20, 30, 20, 30));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -68,17 +62,17 @@ public class FormularioLogin extends JFrame {
         campoClave.setFont(new Font("Segoe UI", Font.PLAIN, 16));
 
         JButton botonIngresar = new JButton("Ingresar");
-        botonIngresar.setBackground(AZUL_ELECTRICO);
-        botonIngresar.setForeground(Color.WHITE);
+        botonIngresar.setBackground(UIManager.getColor("Button.default.background"));
+        botonIngresar.setForeground(UIManager.getColor("Button.default.foreground"));
         botonIngresar.setFocusPainted(false);
         botonIngresar.setFont(new Font("Segoe UI", Font.BOLD, 15));
         botonIngresar.addActionListener(e -> iniciarSesion());
 
-        JButton botonCrearCuenta = new JButton("Crear Cuenta", FontIcon.of(FontAwesomeSolid.USER_PLUS, 14, AZUL_ELECTRICO));
+        JButton botonCrearCuenta = new JButton("Crear Cuenta", FontIcon.of(FontAwesomeSolid.USER_PLUS, 14, TemaVisual.AZUL_INSTITUCIONAL));
         botonCrearCuenta.setBorderPainted(false);
         botonCrearCuenta.setContentAreaFilled(false);
         botonCrearCuenta.setFocusPainted(false);
-        botonCrearCuenta.setForeground(AZUL_ELECTRICO);
+        botonCrearCuenta.setForeground(TemaVisual.AZUL_INSTITUCIONAL);
         botonCrearCuenta.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         botonCrearCuenta.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         botonCrearCuenta.addActionListener(e -> {
@@ -143,7 +137,7 @@ public class FormularioLogin extends JFrame {
     }
 
     public static void main(String[] args) {
-        FlatLightLaf.setup();
+        TemaVisual.aplicarTema(false);
         SwingUtilities.invokeLater(() -> new FormularioLogin().setVisible(true));
     }
 }
