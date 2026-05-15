@@ -12,6 +12,7 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.io.File;
+import java.util.Map;
 
 public class MenuPrincipal extends JFrame {
     private static final Color AZUL_MEDIANOCHE = Color.decode("#2C3E50");
@@ -41,11 +42,14 @@ public class MenuPrincipal extends JFrame {
 
         JButton botonBackup = crearBoton("Generar Backup", FontAwesomeSolid.SAVE);
         botonBackup.addActionListener(e -> ejecutarBackup());
+        JButton botonSalir = crearBotonSalir();
+        botonSalir.addActionListener(e -> cerrarSesion());
 
         JPanel panelDerechaCabecera = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         panelDerechaCabecera.setOpaque(false);
         panelDerechaCabecera.add(botonTema);
         panelDerechaCabecera.add(botonBackup);
+        panelDerechaCabecera.add(botonSalir);
 
         cabecera.add(bienvenida, BorderLayout.WEST);
         cabecera.add(panelDerechaCabecera, BorderLayout.EAST);
@@ -63,8 +67,7 @@ public class MenuPrincipal extends JFrame {
             acciones.add(botonUsuarios);
         }
 
-        JPanel graficoPanel = estadosServicio.noHayActivosRegistrados() ? graficosServicio.crearPanelSinDatos() : graficosServicio.crearGraficoEstados(estadosServicio.obtenerEstados());
-        graficoPanel.setBorder(BorderFactory.createTitledBorder("Resumen de estados"));
+        JPanel graficoPanel = crearPanelGraficoEstilizado();
 
         centro.add(acciones, BorderLayout.NORTH);
         centro.add(graficoPanel, BorderLayout.CENTER);
@@ -102,6 +105,19 @@ public class MenuPrincipal extends JFrame {
         }
     }
 
+    private JPanel crearPanelGraficoEstilizado() {
+        Map<String, Integer> estados = estadosServicio.obtenerEstados();
+        JPanel graficoPanel = estados == null || estados.isEmpty() ? graficosServicio.crearPanelSinDatos() : graficosServicio.crearGraficoEstados(estados, colorTemaActual());
+        graficoPanel.setBorder(BorderFactory.createTitledBorder("Resumen de estados"));
+        graficoPanel.setBackground(colorTemaActual());
+        return graficoPanel;
+    }
+
+    private Color colorTemaActual() {
+        Color color = UIManager.getColor("Panel.background");
+        return color == null ? Color.decode("#F4F6F8") : color;
+    }
+
     private JButton crearBoton(String texto, FontAwesomeSolid icono) {
         JButton boton = new JButton(texto, FontIcon.of(icono, 14));
         boton.setHorizontalTextPosition(SwingConstants.RIGHT);
@@ -110,6 +126,31 @@ public class MenuPrincipal extends JFrame {
         boton.setForeground(UIManager.getColor("Button.foreground"));
         boton.setBorder(new RoundedBorder(12));
         return boton;
+    }
+
+    private JButton crearBotonSalir() {
+        JButton boton = new JButton("Cerrar Sesión", FontIcon.of(FontAwesomeSolid.SIGN_OUT_ALT, 14));
+        boton.setHorizontalTextPosition(SwingConstants.RIGHT);
+        boton.setIconTextGap(8);
+        boton.setBackground(Color.decode("#E57373"));
+        boton.setForeground(UIManager.getColor("Button.foreground"));
+        boton.setBorder(new RoundedBorder(12));
+        return boton;
+    }
+
+    private void cerrarSesion() {
+        for (Window ventana : Window.getWindows()) {
+            if (ventana != this) {
+                ventana.dispose();
+            }
+        }
+        dispose();
+        SwingUtilities.invokeLater(() -> {
+            FormularioLogin login = new FormularioLogin();
+            login.setVisible(true);
+            login.toFront();
+            login.requestFocus();
+        });
     }
 
     private static class RoundedBorder implements Border {

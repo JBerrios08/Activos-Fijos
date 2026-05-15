@@ -29,9 +29,15 @@ public class GestionUsuarios extends JFrame {
         principal.setBackground(BLANCO_NIEVE);
         principal.setBorder(new EmptyBorder(20, 20, 20, 20));
 
+        JPanel encabezado = new JPanel(new BorderLayout());
+        encabezado.setOpaque(false);
+        JButton botonRegresar = crearBotonAccion("Regresar", FontAwesomeSolid.ARROW_LEFT);
+        botonRegresar.addActionListener(e -> regresarAlMenuPrincipal());
         JLabel titulo = new JLabel("Administración de Usuarios");
         titulo.setFont(new Font("Segoe UI", Font.BOLD, 22));
         titulo.setForeground(AZUL_MEDIANOCHE);
+        encabezado.add(botonRegresar, BorderLayout.WEST);
+        encabezado.add(titulo, BorderLayout.CENTER);
 
         JPanel formulario = new JPanel(new GridBagLayout());
         formulario.setBackground(BLANCO_NIEVE);
@@ -64,7 +70,7 @@ public class GestionUsuarios extends JFrame {
         acciones.add(botonEditar);
         acciones.add(botonEliminar);
 
-        principal.add(titulo, BorderLayout.NORTH);
+        principal.add(encabezado, BorderLayout.NORTH);
         principal.add(formulario, BorderLayout.CENTER);
         principal.add(acciones, BorderLayout.SOUTH);
 
@@ -143,6 +149,26 @@ public class GestionUsuarios extends JFrame {
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+
+    private void regresarAlMenuPrincipal() {
+        Window menu = buscarMenuPrincipal();
+        dispose();
+        if (menu != null) {
+            menu.setVisible(true);
+            menu.toFront();
+            menu.requestFocus();
+        }
+    }
+
+    private Window buscarMenuPrincipal() {
+        for (Window ventana : Window.getWindows()) {
+            if (ventana instanceof MenuPrincipal) {
+                return ventana;
+            }
+        }
+        return null;
     }
 
     private String mapearRol(String rol) {

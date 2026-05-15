@@ -3,6 +3,9 @@ package com.activosfijos.servicio;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.category.StandardBarPainter;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import javax.swing.*;
@@ -11,7 +14,10 @@ import java.util.Map;
 
 public class GraficosServicio {
 
-    public JPanel crearGraficoEstados(Map<String, Integer> datosEstados) {
+    private static final Color AZUL_MEDIANOCHE = Color.decode("#2C3E50");
+    private static final Color AZUL_ELECTRICO = Color.decode("#3498DB");
+
+    public JPanel crearGraficoEstados(Map<String, Integer> datosEstados, Color colorFondoTema) {
         if (datosEstados == null || datosEstados.isEmpty()) {
             return crearPanelSinDatos();
         }
@@ -22,13 +28,34 @@ public class GraficosServicio {
         }
 
         JFreeChart chart = ChartFactory.createBarChart("Activos por Estado", "Estado", "Cantidad", dataset);
+        estilizarGrafico(chart, colorFondoTema);
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new Dimension(360, 240));
+        chartPanel.setBackground(colorFondoTema);
 
         JPanel contenedor = new JPanel(new BorderLayout());
-        contenedor.setOpaque(false);
+        contenedor.setBackground(colorFondoTema);
         contenedor.add(chartPanel, BorderLayout.CENTER);
         return contenedor;
+    }
+
+    private void estilizarGrafico(JFreeChart chart, Color colorFondoTema) {
+        chart.setBackgroundPaint(colorFondoTema);
+        chart.getTitle().setPaint(UIManager.getColor("Label.foreground"));
+        CategoryPlot plot = chart.getCategoryPlot();
+        plot.setBackgroundPaint(colorFondoTema);
+        plot.setOutlineVisible(false);
+        plot.setRangeGridlinePaint(AZUL_MEDIANOCHE.brighter());
+        plot.getDomainAxis().setTickLabelPaint(UIManager.getColor("Label.foreground"));
+        plot.getDomainAxis().setLabelPaint(UIManager.getColor("Label.foreground"));
+        plot.getRangeAxis().setTickLabelPaint(UIManager.getColor("Label.foreground"));
+        plot.getRangeAxis().setLabelPaint(UIManager.getColor("Label.foreground"));
+
+        BarRenderer renderer = (BarRenderer) plot.getRenderer();
+        renderer.setSeriesPaint(0, AZUL_ELECTRICO);
+        renderer.setBarPainter(new StandardBarPainter());
+        renderer.setShadowVisible(false);
+        renderer.setDrawBarOutline(false);
     }
 
     public JPanel crearPanelSinDatos() {

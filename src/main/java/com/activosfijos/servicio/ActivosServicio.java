@@ -51,4 +51,25 @@ public class ActivosServicio {
         }
         return filas;
     }
+
+    public double calcularDepreciacionLineaRecta(double valorCompra, double valorRescate, int vidaUtil) {
+        validarDatosDepreciacion(valorCompra, valorRescate, vidaUtil);
+        return (valorCompra - valorRescate) / vidaUtil;
+    }
+
+    private void validarDatosDepreciacion(double valorCompra, double valorRescate, int vidaUtil) {
+        if (vidaUtil <= 0) {
+            throw new IllegalArgumentException("La vida útil debe ser mayor a cero.");
+        }
+        if (valorCompra <= 0) {
+            throw new IllegalArgumentException("El valor de compra debe ser mayor a cero.");
+        }
+        if (valorRescate < 0) {
+            throw new IllegalArgumentException("El valor de rescate no puede ser negativo.");
+        }
+        if (valorRescate >= valorCompra) {
+            throw new IllegalArgumentException("El valor de rescate debe ser menor al valor de compra.");
+        }
+    }
+
 }
