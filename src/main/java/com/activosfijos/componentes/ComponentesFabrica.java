@@ -20,18 +20,18 @@ public final class ComponentesFabrica {
         boton.setFocusPainted(false);
         boton.setContentAreaFilled(true);
         boton.setOpaque(true);
-        boton.setBackground(TemaVisual.AZUL_INSTITUCIONAL);
-        boton.setForeground(TemaVisual.GRIS_CLARO);
+        boton.setBackground(UIManager.getColor("Button.default.background") != null ? UIManager.getColor("Button.default.background") : TemaVisual.AZUL_INSTITUCIONAL);
+        boton.setForeground(UIManager.getColor("Button.default.foreground") != null ? UIManager.getColor("Button.default.foreground") : TemaVisual.GRIS_CLARO);
         boton.setBorder(new BordeRedondeado(12));
         boton.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent e) {
-                boton.setBackground(TemaVisual.AZUL_CLARO);
+                boton.setBackground(UIManager.getColor("Button.background") != null ? UIManager.getColor("Button.background") : TemaVisual.AZUL_SUAVE);
             }
 
             @Override
             public void mouseExited(java.awt.event.MouseEvent e) {
-                boton.setBackground(TemaVisual.AZUL_INSTITUCIONAL);
+                boton.setBackground(UIManager.getColor("Button.default.background") != null ? UIManager.getColor("Button.default.background") : TemaVisual.AZUL_INSTITUCIONAL);
             }
         });
         return boton;
@@ -41,20 +41,20 @@ public final class ComponentesFabrica {
         JButton boton = new JButton(texto);
         boton.setContentAreaFilled(true);
         boton.setOpaque(true);
-        boton.setBackground(TemaVisual.AZUL_CLARO);
-        boton.setForeground(TemaVisual.GRIS_CLARO);
+        boton.setBackground(UIManager.getColor("Button.background") != null ? UIManager.getColor("Button.background") : TemaVisual.AZUL_SUAVE);
+        boton.setForeground(UIManager.getColor("Button.foreground") != null ? UIManager.getColor("Button.foreground") : TemaVisual.AZUL_INSTITUCIONAL);
         boton.setFocusPainted(false);
         boton.setFont(new Font("Segoe UI", Font.BOLD, 15));
         boton.setBorder(new BordeRedondeado(12));
         boton.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent e) {
-                boton.setBackground(TemaVisual.AZUL_INSTITUCIONAL);
+                boton.setBackground(UIManager.getColor("Button.default.background") != null ? UIManager.getColor("Button.default.background") : TemaVisual.AZUL_INSTITUCIONAL);
             }
 
             @Override
             public void mouseExited(java.awt.event.MouseEvent e) {
-                boton.setBackground(TemaVisual.AZUL_CLARO);
+                boton.setBackground(UIManager.getColor("Button.background") != null ? UIManager.getColor("Button.background") : TemaVisual.AZUL_SUAVE);
             }
         });
         return boton;

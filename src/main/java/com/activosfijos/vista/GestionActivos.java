@@ -69,9 +69,11 @@ public class GestionActivos extends JFrame {
         JPanel centro = new JPanel(new BorderLayout(8, 8));
         JPanel formulario = crearFormulario();
         JScrollPane scrollTabla = new JScrollPane(crearTablaActivos());
-        scrollTabla.setPreferredSize(new Dimension(0, 320));
+        scrollTabla.setPreferredSize(new Dimension(0, 360));
+        scrollTabla.setMinimumSize(new Dimension(0, 325));
         JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, formulario, scrollTabla);
-        split.setResizeWeight(0.5);
+        split.setResizeWeight(0.38);
+        split.setDividerLocation(245);
         split.setDividerSize(6);
         split.setBorder(null);
         centro.add(split, BorderLayout.CENTER);
@@ -79,11 +81,9 @@ public class GestionActivos extends JFrame {
     }
 
     private JPanel crearFormulario() {
-        JPanel formulario = new JPanel(new GridBagLayout());
+        JPanel formulario = new JPanel(new BorderLayout(10, 8));
         formulario.setBorder(new EmptyBorder(8, 12, 8, 12));
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(4, 8, 4, 8);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        JPanel campos = new JPanel(new GridLayout(4, 2, 12, 6));
 
         campoCodigoBarra = ComponentesFabrica.crearCampoTexto(20);
         campoNombre = ComponentesFabrica.crearCampoTexto(20);
@@ -108,14 +108,15 @@ public class GestionActivos extends JFrame {
             public void changedUpdate(DocumentEvent e) { filtrarTabla(); }
         });
 
-        agregarCampo(formulario, gbc, 0, "Código de Barra", campoCodigoBarra);
-        agregarCampo(formulario, gbc, 1, "Nombre", campoNombre);
-        agregarCampo(formulario, gbc, 2, "Descripción", campoDescripcion);
-        agregarCampo(formulario, gbc, 3, "Serie", campoSerie);
-        agregarCampo(formulario, gbc, 4, "Valor de Compra", campoValorCompra);
-        agregarCampo(formulario, gbc, 5, "", etiquetaIva);
-        agregarCampo(formulario, gbc, 6, "Estado", comboEstado);
-        agregarCampo(formulario, gbc, 7, "Buscar", campoBuscar);
+        campos.add(crearCampoFormulario("Código de Barra", campoCodigoBarra));
+        campos.add(crearCampoFormulario("Nombre", campoNombre));
+        campos.add(crearCampoFormulario("Descripción", campoDescripcion));
+        campos.add(crearCampoFormulario("Serie", campoSerie));
+        campos.add(crearCampoFormulario("Valor de Compra", campoValorCompra));
+        campos.add(crearCampoFormulario("Estado", comboEstado));
+        campos.add(crearCampoFormulario("Buscar", campoBuscar));
+        campos.add(crearCampoFormulario("", etiquetaIva));
+        formulario.add(campos, BorderLayout.CENTER);
         return formulario;
     }
 
@@ -191,17 +192,14 @@ public class GestionActivos extends JFrame {
     private void exportarPdf() { JFileChooser chooser = new JFileChooser(); chooser.setSelectedFile(new File("activos.pdf")); if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) { try { reportesServicio.exportarTablaAPdf(tablaActivos.getModel(), chooser.getSelectedFile()); JOptionPane.showMessageDialog(this, "PDF generado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE); } catch (Exception ex) { JOptionPane.showMessageDialog(this, "Error al generar PDF: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);} } }
     private void exportarCsv() { JFileChooser chooser = new JFileChooser(); chooser.setSelectedFile(new File("activos.csv")); if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) { try { reportesServicio.exportarTablaACsv(tablaActivos.getModel(), chooser.getSelectedFile()); JOptionPane.showMessageDialog(this, "CSV generado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE); } catch (Exception ex) { JOptionPane.showMessageDialog(this, "Error al generar CSV: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);} } }
 
-    private void agregarCampo(JPanel panel, GridBagConstraints gbc, int fila, String etiqueta, JComponent componente) {
+    private JPanel crearCampoFormulario(String etiqueta, JComponent componente) {
+        JPanel campo = new JPanel(new BorderLayout(0, 4));
+        campo.setOpaque(false);
         if (!etiqueta.isBlank()) {
-            gbc.gridx = 0;
-            gbc.gridy = fila;
-            gbc.weightx = 0.2;
-            panel.add(ComponentesFabrica.crearEtiquetaFormulario(etiqueta), gbc);
+            campo.add(ComponentesFabrica.crearEtiquetaFormulario(etiqueta), BorderLayout.NORTH);
         }
-        gbc.gridx = 1;
-        gbc.gridy = fila;
-        gbc.weightx = 0.8;
-        panel.add(componente, gbc);
+        campo.add(componente, BorderLayout.CENTER);
+        return campo;
     }
 
     private void guardarActivo() {
