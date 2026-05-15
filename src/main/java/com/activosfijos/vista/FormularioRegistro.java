@@ -17,7 +17,7 @@ public class FormularioRegistro extends JFrame {
     private static final Color BLANCO_NIEVE = Color.decode("#ECF0F1");
     private static final Color AZUL_ELECTRICO = Color.decode("#3498DB");
 
-    private final JTextField campoNombre;
+    private final JTextField campoNombreUsuario;
     private final JPasswordField campoClave;
     private final JComboBox<String> comboRol;
     private final JFrame loginFrame;
@@ -42,7 +42,7 @@ public class FormularioRegistro extends JFrame {
         titulo.setForeground(AZUL_MEDIANOCHE);
         titulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
 
-        campoNombre = new JTextField(20);
+        campoNombreUsuario = new JTextField(20);
         campoClave = new JPasswordField(20);
         comboRol = new JComboBox<>(new String[]{"operador", "administrador"});
 
@@ -59,9 +59,9 @@ public class FormularioRegistro extends JFrame {
 
         gbc.gridwidth = 1;
         gbc.gridy = 1;
-        panel.add(new JLabel("Nombre"), gbc);
+        panel.add(new JLabel("Nombre de usuario"), gbc);
         gbc.gridx = 1;
-        panel.add(campoNombre, gbc);
+        panel.add(campoNombreUsuario, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -84,19 +84,19 @@ public class FormularioRegistro extends JFrame {
     }
 
     private void registrarUsuario() {
-        String nombre = campoNombre.getText().trim();
+        String nombreUsuario = campoNombreUsuario.getText().trim();
         String clave = new String(campoClave.getPassword()).trim();
         String rol = (String) comboRol.getSelectedItem();
 
-        if (nombre.isEmpty() || clave.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Nombre y clave son obligatorios.", "Validación", JOptionPane.WARNING_MESSAGE);
+        if (nombreUsuario.isEmpty() || clave.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Nombre de usuario y clave son obligatorios.", "Validación", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        String sql = "INSERT INTO usuarios (nombre, clave, rol) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO usuarios (nombre_usuario, clave, rol) VALUES (?, ?, ?)";
         try (Connection conexion = ConexionBaseDatos.obtenerConexion();
              PreparedStatement ps = conexion.prepareStatement(sql)) {
-            ps.setString(1, nombre);
+            ps.setString(1, nombreUsuario);
             ps.setString(2, clave);
             ps.setString(3, rol);
             ps.executeUpdate();
@@ -106,7 +106,6 @@ public class FormularioRegistro extends JFrame {
                 loginFrame.setVisible(true);
             }
         } catch (SQLException ex) {
-            System.err.println("Error SQL al registrar usuario: " + ex.getMessage());
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "No fue posible registrar el usuario.", "Error", JOptionPane.ERROR_MESSAGE);
         }
