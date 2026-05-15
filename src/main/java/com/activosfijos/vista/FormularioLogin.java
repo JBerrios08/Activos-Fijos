@@ -139,10 +139,15 @@ public class FormularioLogin extends JFrame {
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
                         String rol = rs.getString("rol");
-                        SwingUtilities.invokeLater(() -> {
-                            new MenuPrincipal(nombreUsuario, rol).setVisible(true);
-                            dispose();
-                        });
+                        String codigo = JOptionPane.showInputDialog(this, "Ingrese Código de Verificación (MFA)", "1234");
+                        if ("1234".equals(codigo)) {
+                            SwingUtilities.invokeLater(() -> {
+                                new MenuPrincipal(nombreUsuario, rol).setVisible(true);
+                                dispose();
+                            });
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Código de verificación incorrecto.", "MFA", JOptionPane.ERROR_MESSAGE);
+                        }
                     } else {
                         JOptionPane.showMessageDialog(this, "Credenciales incorrectas.", "Acceso denegado", JOptionPane.ERROR_MESSAGE);
                     }
