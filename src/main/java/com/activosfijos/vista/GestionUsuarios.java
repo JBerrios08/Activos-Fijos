@@ -1,6 +1,6 @@
 package com.activosfijos.vista;
 
-import com.activosfijos.util.ConexionBaseDatos;
+import com.activosfijos.servicio.UsuariosServicio;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -8,12 +8,6 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-
-/**
- * Módulo para creación, edición y eliminación de usuarios.
- */
 public class GestionUsuarios extends JFrame {
 
     private static final Color AZUL_MEDIANOCHE = Color.decode("#2C3E50");
@@ -23,16 +17,17 @@ public class GestionUsuarios extends JFrame {
     private JTextField campoUsuario;
     private JPasswordField campoClave;
     private JComboBox<String> comboRol;
+    private final UsuariosServicio usuariosServicio = new UsuariosServicio();
 
     public GestionUsuarios() {
         setTitle("Activos Fijos - Gestión de Usuarios");
-        setSize(800, 500);
+        setSize(950, 650);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         JPanel principal = new JPanel(new BorderLayout(12, 12));
         principal.setBackground(BLANCO_NIEVE);
-        principal.setBorder(new EmptyBorder(16, 16, 16, 16));
+        principal.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         JLabel titulo = new JLabel("Administración de Usuarios");
         titulo.setFont(new Font("Segoe UI", Font.BOLD, 22));
@@ -100,21 +95,15 @@ public class GestionUsuarios extends JFrame {
         String usuario = campoUsuario.getText().trim();
         String clave = new String(campoClave.getPassword()).trim();
         String rol = (String) comboRol.getSelectedItem();
-
         if (usuario.isEmpty() || clave.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Usuario y clave son obligatorios.", "Validación", JOptionPane.WARNING_MESSAGE);
             return;
         }
-
-        String sql = "INSERT INTO usuarios (nombre_usuario, clave, rol) VALUES (?, ?, ?)";
-        try (Connection cn = ConexionBaseDatos.obtenerConexion(); PreparedStatement ps = cn.prepareStatement(sql)) {
-            ps.setString(1, usuario);
-            ps.setString(2, clave);
-            ps.setString(3, mapearRol(rol));
-            ps.executeUpdate();
+        try {
+            usuariosServicio.insertar(usuario, clave, mapearRol(rol));
             JOptionPane.showMessageDialog(this, "Usuario creado con éxito", "Éxito", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error de conexión", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -122,25 +111,19 @@ public class GestionUsuarios extends JFrame {
         String usuario = campoUsuario.getText().trim();
         String clave = new String(campoClave.getPassword()).trim();
         String rol = (String) comboRol.getSelectedItem();
-
         if (usuario.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Indique el usuario a editar.", "Validación", JOptionPane.WARNING_MESSAGE);
             return;
         }
-
-        String sql = "UPDATE usuarios SET clave = ?, rol = ? WHERE nombre_usuario = ?";
-        try (Connection cn = ConexionBaseDatos.obtenerConexion(); PreparedStatement ps = cn.prepareStatement(sql)) {
-            ps.setString(1, clave);
-            ps.setString(2, mapearRol(rol));
-            ps.setString(3, usuario);
-            int filas = ps.executeUpdate();
+        try {
+            int filas = usuariosServicio.actualizar(usuario, clave, mapearRol(rol));
             if (filas > 0) {
                 JOptionPane.showMessageDialog(this, "Usuario actualizado con éxito", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this, "Usuario no encontrado.", "Aviso", JOptionPane.WARNING_MESSAGE);
             }
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error de conexión", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -150,18 +133,15 @@ public class GestionUsuarios extends JFrame {
             JOptionPane.showMessageDialog(this, "Indique el usuario a eliminar.", "Validación", JOptionPane.WARNING_MESSAGE);
             return;
         }
-
-        String sql = "DELETE FROM usuarios WHERE nombre_usuario = ?";
-        try (Connection cn = ConexionBaseDatos.obtenerConexion(); PreparedStatement ps = cn.prepareStatement(sql)) {
-            ps.setString(1, usuario);
-            int filas = ps.executeUpdate();
+        try {
+            int filas = usuariosServicio.eliminar(usuario);
             if (filas > 0) {
                 JOptionPane.showMessageDialog(this, "Usuario eliminado con éxito", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this, "Usuario no encontrado.", "Aviso", JOptionPane.WARNING_MESSAGE);
             }
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error de conexión", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

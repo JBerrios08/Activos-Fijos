@@ -1,6 +1,6 @@
 package com.activosfijos.vista;
 
-import com.activosfijos.util.ConexionBaseDatos;
+import com.activosfijos.servicio.AutenticacionServicio;
 import com.formdev.flatlaf.FlatLightLaf;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
@@ -8,13 +8,7 @@ import org.kordamp.ikonli.swing.FontIcon;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 
-/**
- * Pantalla de autenticación principal.
- */
 public class FormularioLogin extends JFrame {
 
     private static final Color AZUL_MEDIANOCHE = Color.decode("#2C3E50");
@@ -23,6 +17,7 @@ public class FormularioLogin extends JFrame {
 
     private final JTextField campoUsuario;
     private final JPasswordField campoClave;
+    private final AutenticacionServicio autenticacionServicio = new AutenticacionServicio();
 
     public FormularioLogin() {
         setTitle("Activos Fijos - Inicio de Sesión");
@@ -127,35 +122,23 @@ public class FormularioLogin extends JFrame {
             return;
         }
 
-        String sql = "SELECT * FROM usuarios WHERE nombre_usuario = ? AND clave = ?";
-
-        try (Connection conexion = ConexionBaseDatos.obtenerConexion()) {
-            System.out.println("Conexión a MySQL exitosa para inicio de sesión.");
-
-            try (PreparedStatement ps = conexion.prepareStatement(sql)) {
-                ps.setString(1, nombreUsuario);
-                ps.setString(2, clave);
-
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        String rol = rs.getString("rol");
-                        String codigo = JOptionPane.showInputDialog(this, "Ingrese Código de Verificación (MFA)", "1234");
-                        if ("1234".equals(codigo)) {
-                            SwingUtilities.invokeLater(() -> {
-                                new MenuPrincipal(nombreUsuario, rol).setVisible(true);
-                                dispose();
-                            });
-                        } else {
-                            JOptionPane.showMessageDialog(this, "Código de verificación incorrecto.", "MFA", JOptionPane.ERROR_MESSAGE);
-                        }
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Credenciales incorrectas.", "Acceso denegado", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
+        try {
+            String rol = autenticacionServicio.autenticar(nombreUsuario, clave);
+            if (rol == null) {
+                JOptionPane.showMessageDialog(this, "Credenciales incorrectas.", "Acceso denegado", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            String codigo = JOptionPane.showInputDialog(this, "Ingrese código de verificación", "Segundo paso", JOptionPane.QUESTION_MESSAGE);
+            if ("1234".equals(codigo)) {
+                SwingUtilities.invokeLater(() -> {
+                    new MenuPrincipal(nombreUsuario, rol).setVisible(true);
+                    dispose();
+                });
+            } else {
+                JOptionPane.showMessageDialog(this, "Código de verificación incorrecto.", "MFA", JOptionPane.ERROR_MESSAGE);
             }
         } catch (Exception ex) {
-            System.out.println("Falló la conexión o consulta de inicio de sesión: " + ex.getMessage());
-            JOptionPane.showMessageDialog(this, "Error de conexión: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

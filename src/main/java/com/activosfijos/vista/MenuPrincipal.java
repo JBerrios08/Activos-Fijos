@@ -1,7 +1,9 @@
 package com.activosfijos.vista;
 
 import com.activosfijos.servicio.GraficosServicio;
-import com.activosfijos.util.ConexionBaseDatos;
+import com.activosfijos.servicio.EstadosServicio;
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.swing.FontIcon;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 
@@ -10,10 +12,6 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.io.File;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class MenuPrincipal extends JFrame {
@@ -21,16 +19,17 @@ public class MenuPrincipal extends JFrame {
     private static final Color BLANCO_NIEVE = Color.decode("#ECF0F1");
     private static final Color AZUL_ELECTRICO = Color.decode("#3498DB");
     private boolean modoOscuro = false;
+    private final EstadosServicio estadosServicio = new EstadosServicio();
 
     public MenuPrincipal(String usuario, String rol) {
         setTitle("Activos Fijos - Menú Principal");
-        setSize(1100, 700);
+        setSize(950, 650);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         JPanel principal = new JPanel(new BorderLayout(12, 12));
         principal.setBackground(BLANCO_NIEVE);
-        principal.setBorder(new EmptyBorder(16, 16, 16, 16));
+        principal.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         JPanel cabecera = new JPanel(new BorderLayout());
         cabecera.setBackground(AZUL_MEDIANOCHE);
@@ -39,10 +38,10 @@ public class MenuPrincipal extends JFrame {
         JLabel bienvenida = new JLabel(" Usuario: " + usuario + "  |  Rol: " + rol);
         bienvenida.setForeground(Color.WHITE);
 
-        JButton botonTema = crearBoton("Modo Claro/Oscuro");
+        JButton botonTema = crearBoton("Modo Claro/Oscuro", FontAwesomeSolid.ADJUST);
         botonTema.addActionListener(e -> alternarTema());
 
-        JButton botonBackup = crearBoton("Generar Backup");
+        JButton botonBackup = crearBoton("Generar Backup", FontAwesomeSolid.SAVE);
         botonBackup.addActionListener(e -> ejecutarBackup());
 
         JPanel panelDerechaCabecera = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
@@ -58,17 +57,17 @@ public class MenuPrincipal extends JFrame {
 
         JPanel acciones = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 20));
         acciones.setBackground(BLANCO_NIEVE);
-        JButton botonGestion = crearBoton("Ir a Gestión de Activos");
+        JButton botonGestion = crearBoton("Ir a Gestión de Activos", FontAwesomeSolid.SEARCH);
         botonGestion.addActionListener(e -> new GestionActivos().setVisible(true));
         acciones.add(botonGestion);
 
         if ("admin".equalsIgnoreCase(rol)) {
-            JButton botonUsuarios = crearBoton("Administrar Usuarios");
+            JButton botonUsuarios = crearBoton("Administrar Usuarios", FontAwesomeSolid.USER_PLUS);
             botonUsuarios.addActionListener(e -> new GestionUsuarios().setVisible(true));
             acciones.add(botonUsuarios);
         }
 
-        JPanel graficoPanel = new GraficosServicio().crearGraficoEstados(obtenerEstados());
+        JPanel graficoPanel = new GraficosServicio().crearGraficoEstados(estadosServicio.obtenerEstados());
         graficoPanel.setBorder(BorderFactory.createTitledBorder("Resumen de estados"));
 
         centro.add(acciones, BorderLayout.NORTH);
@@ -79,18 +78,6 @@ public class MenuPrincipal extends JFrame {
         setContentPane(principal);
     }
 
-    private Map<String, Integer> obtenerEstados() {
-        Map<String, Integer> estados = new LinkedHashMap<>();
-        String sql = "SELECT estado, COUNT(*) total FROM activos GROUP BY estado";
-        try (Connection conn = ConexionBaseDatos.obtenerConexion(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                estados.put(rs.getString("estado"), rs.getInt("total"));
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return estados;
-    }
 
     private void ejecutarBackup() {
         try {
@@ -118,8 +105,8 @@ public class MenuPrincipal extends JFrame {
         }
     }
 
-    private JButton crearBoton(String texto) {
-        JButton boton = new JButton(texto);
+    private JButton crearBoton(String texto, FontAwesomeSolid icono) {
+        JButton boton = new JButton(texto, FontIcon.of(icono, 14, Color.WHITE));
         boton.setBackground(AZUL_ELECTRICO);
         boton.setForeground(Color.WHITE);
         boton.setBorder(new RoundedBorder(12));
