@@ -3,7 +3,6 @@ package com.activosfijos.vista;
 import com.activosfijos.componentes.ComponentesFabrica;
 import com.activosfijos.servicio.AutenticacionServicio;
 import com.activosfijos.util.TemaVisual;
-import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -56,7 +55,7 @@ public class FormularioLogin extends JFrame {
 
         JButton botonIngresar = ComponentesFabrica.crearBotonPrimario("Ingresar");
         botonIngresar.addActionListener(e -> iniciarSesion());
-        JButton botonCrearCuenta = ComponentesFabrica.crearBotonEnlaceConIcono("Crear Cuenta", FontAwesomeSolid.USER_PLUS);
+        JButton botonCrearCuenta = ComponentesFabrica.crearBotonCrearCuenta();
         botonCrearCuenta.addActionListener(e -> { new FormularioRegistro(this).setVisible(true); setVisible(false); });
 
         gbc.gridx = 0; gbc.gridy = 0; formulario.add(ComponentesFabrica.crearEtiquetaFormulario("Usuario"), gbc);

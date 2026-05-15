@@ -3,7 +3,6 @@ package com.activosfijos.vista;
 import com.activosfijos.componentes.ComponentesFabrica;
 import com.activosfijos.servicio.UsuariosServicio;
 import com.activosfijos.util.TemaVisual;
-import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -35,7 +34,7 @@ public class GestionUsuarios extends JFrame {
     private JPanel crearEncabezado() {
         JPanel encabezado = new JPanel(new BorderLayout());
         encabezado.setOpaque(false);
-        JButton botonRegresar = ComponentesFabrica.crearBotonConIcono("Regresar", FontAwesomeSolid.ARROW_LEFT);
+        JButton botonRegresar = ComponentesFabrica.crearBotonRegresar();
         botonRegresar.addActionListener(e -> regresarAlMenuPrincipal());
         encabezado.add(botonRegresar, BorderLayout.WEST);
         encabezado.add(ComponentesFabrica.crearTituloSeccion("Administración de Usuarios", 22, TemaVisual.AZUL_INSTITUCIONAL), BorderLayout.CENTER);
@@ -61,9 +60,9 @@ public class GestionUsuarios extends JFrame {
 
     private JPanel crearAcciones() {
         JPanel acciones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
-        JButton botonCrear = ComponentesFabrica.crearBotonConIcono("Crear", FontAwesomeSolid.USER_PLUS);
-        JButton botonEditar = ComponentesFabrica.crearBotonConIcono("Editar", FontAwesomeSolid.SEARCH);
-        JButton botonEliminar = ComponentesFabrica.crearBotonConIcono("Eliminar", FontAwesomeSolid.TRASH_ALT);
+        JButton botonCrear = ComponentesFabrica.crearBotonCrearUsuario();
+        JButton botonEditar = ComponentesFabrica.crearBotonEditarUsuario();
+        JButton botonEliminar = ComponentesFabrica.crearBotonEliminar();
         botonCrear.addActionListener(e -> crearUsuario());
         botonEditar.addActionListener(e -> editarUsuario());
         botonEliminar.addActionListener(e -> eliminarUsuario());
