@@ -2,6 +2,8 @@ package com.activosfijos.vista;
 
 import com.activosfijos.util.ConexionBaseDatos;
 import com.formdev.flatlaf.FlatLightLaf;
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.swing.FontIcon;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -77,14 +79,17 @@ public class FormularioLogin extends JFrame {
         botonIngresar.setFont(new Font("Segoe UI", Font.BOLD, 15));
         botonIngresar.addActionListener(e -> iniciarSesion());
 
-        JButton botonRegistro = new JButton("¿No tienes cuenta? Regístrate aquí");
-        botonRegistro.setBorderPainted(false);
-        botonRegistro.setContentAreaFilled(false);
-        botonRegistro.setFocusPainted(false);
-        botonRegistro.setForeground(AZUL_ELECTRICO);
-        botonRegistro.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        botonRegistro.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        botonRegistro.addActionListener(e -> new RegistroUsuario().setVisible(true));
+        JButton botonCrearCuenta = new JButton("Crear Cuenta", FontIcon.of(FontAwesomeSolid.USER_PLUS, 14, AZUL_ELECTRICO));
+        botonCrearCuenta.setBorderPainted(false);
+        botonCrearCuenta.setContentAreaFilled(false);
+        botonCrearCuenta.setFocusPainted(false);
+        botonCrearCuenta.setForeground(AZUL_ELECTRICO);
+        botonCrearCuenta.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        botonCrearCuenta.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        botonCrearCuenta.addActionListener(e -> {
+            new FormularioRegistro(this).setVisible(true);
+            setVisible(false);
+        });
 
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -103,7 +108,7 @@ public class FormularioLogin extends JFrame {
         formulario.add(botonIngresar, gbc);
 
         gbc.gridy = 5;
-        formulario.add(botonRegistro, gbc);
+        formulario.add(botonCrearCuenta, gbc);
 
         panelLogin.add(formulario);
 
@@ -122,7 +127,7 @@ public class FormularioLogin extends JFrame {
             return;
         }
 
-        String sql = "SELECT rol FROM usuarios WHERE nombre_usuario = ? AND clave = ?";
+        String sql = "SELECT rol FROM usuarios WHERE nombre = ? AND clave = ?";
 
         try (Connection conexion = ConexionBaseDatos.obtenerConexion();
              PreparedStatement ps = conexion.prepareStatement(sql)) {

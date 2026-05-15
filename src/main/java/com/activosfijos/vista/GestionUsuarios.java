@@ -1,12 +1,13 @@
 package com.activosfijos.vista;
 
 import com.activosfijos.util.ConexionBaseDatos;
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.swing.FontIcon;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 
@@ -56,9 +57,9 @@ public class GestionUsuarios extends JFrame {
         JPanel acciones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         acciones.setBackground(BLANCO_NIEVE);
 
-        JButton botonCrear = crearBotonAccion("Crear", cargarIcono("guardar"));
-        JButton botonEditar = crearBotonAccion("Editar", cargarIcono("editar"));
-        JButton botonEliminar = crearBotonAccion("Eliminar", cargarIcono("eliminar"));
+        JButton botonCrear = crearBotonAccion("Crear", FontAwesomeSolid.USER_PLUS);
+        JButton botonEditar = crearBotonAccion("Editar", FontAwesomeSolid.SEARCH);
+        JButton botonEliminar = crearBotonAccion("Eliminar", FontAwesomeSolid.TRASH_ALT);
 
         botonCrear.addActionListener(e -> crearUsuario());
         botonEditar.addActionListener(e -> editarUsuario());
@@ -86,22 +87,13 @@ public class GestionUsuarios extends JFrame {
         panel.add(componente, gbc);
     }
 
-    private JButton crearBotonAccion(String texto, Icon icono) {
-        JButton boton = new JButton(texto, icono);
+    private JButton crearBotonAccion(String texto, FontAwesomeSolid icono) {
+        JButton boton = new JButton(texto, FontIcon.of(icono, 14, Color.WHITE));
         boton.setBackground(AZUL_ELECTRICO);
         boton.setForeground(Color.WHITE);
         boton.setFocusPainted(false);
         boton.setBorder(new RoundedBorder(12));
         return boton;
-    }
-
-    public static Icon cargarIcono(String nombre) {
-        String ruta = "/iconos/" + nombre + ".png";
-        URL recurso = GestionUsuarios.class.getResource(ruta);
-        if (recurso != null) {
-            return new ImageIcon(recurso);
-        }
-        return UIManager.getIcon("OptionPane.informationIcon");
     }
 
     private void crearUsuario() {
