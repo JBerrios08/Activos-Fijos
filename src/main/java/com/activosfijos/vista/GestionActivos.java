@@ -1,7 +1,7 @@
 package com.activosfijos.vista;
 
 import com.activosfijos.servicio.ReportesServicio;
-import com.activosfijos.util.ConexionBaseDatos;
+import com.activosfijos.servicio.ActivosServicio;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -16,10 +16,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.io.File;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 public class GestionActivos extends JFrame {
 
@@ -28,6 +24,7 @@ public class GestionActivos extends JFrame {
     private static final Color AZUL_ELECTRICO = Color.decode("#3498DB");
 
     private final ReportesServicio reportesServicio = new ReportesServicio();
+    private final ActivosServicio activosServicio = new ActivosServicio();
     private JTextField campoCodigoBarra;
     private JTextField campoNombre;
     private JTextField campoDescripcion;
@@ -44,13 +41,13 @@ public class GestionActivos extends JFrame {
 
     public GestionActivos() {
         setTitle("Activos Fijos - Gestión de Activos");
-        setSize(1100, 700);
+        setSize(950, 650);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         JPanel principal = new JPanel(new BorderLayout(12, 12));
         principal.setBackground(BLANCO_NIEVE);
-        principal.setBorder(new EmptyBorder(16, 16, 16, 16));
+        principal.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         JPanel titulo = new JPanel(new BorderLayout());
         titulo.setBackground(AZUL_MEDIANOCHE);
@@ -103,14 +100,17 @@ public class GestionActivos extends JFrame {
 
         JButton botonGuardar = crearBotonAccion("Guardar", FontAwesomeSolid.SAVE);
         JButton botonPdf = crearBotonAccion("PDF", FontAwesomeSolid.FILE_PDF);
-        JButton botonCsv = crearBotonAccion("CSV", FontAwesomeSolid.FILE_CSV);
+        JButton botonEliminar = crearBotonAccion("Eliminar", FontAwesomeSolid.TRASH_ALT);
+        JButton botonCsv = crearBotonAccion("Buscar", FontAwesomeSolid.SEARCH);
 
         botonGuardar.addActionListener(e -> guardarActivo());
         botonPdf.addActionListener(e -> exportarPdf());
+        botonEliminar.addActionListener(e -> limpiarFormulario());
         botonCsv.addActionListener(e -> exportarCsv());
 
         acciones.add(botonGuardar);
         acciones.add(botonPdf);
+        acciones.add(botonEliminar);
         acciones.add(botonCsv);
 
         campoBuscar.getDocument().addDocumentListener(new DocumentListener() {
@@ -165,9 +165,9 @@ public class GestionActivos extends JFrame {
         if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             try {
                 reportesServicio.exportarTablaAPdf(tablaActivos.getModel(), chooser.getSelectedFile());
-                JOptionPane.showMessageDialog(this, "PDF generado correctamente.");
+                JOptionPane.showMessageDialog(this, "PDF generado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error al generar PDF: " + ex.getMessage());
+                JOptionPane.showMessageDialog(this, "Error al generar PDF: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -178,9 +178,9 @@ public class GestionActivos extends JFrame {
         if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             try {
                 reportesServicio.exportarTablaACsv(tablaActivos.getModel(), chooser.getSelectedFile());
-                JOptionPane.showMessageDialog(this, "CSV generado correctamente.");
+                JOptionPane.showMessageDialog(this, "CSV generado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error al generar CSV: " + ex.getMessage());
+                JOptionPane.showMessageDialog(this, "Error al generar CSV: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -206,34 +206,28 @@ public class GestionActivos extends JFrame {
         campoCodigoBarra.setBorder(bordeCodigoOriginal);
         if (campoNombre.getText().trim().isEmpty()) { campoNombre.setBorder(BorderFactory.createLineBorder(Color.RED, 2)); invalido = true; }
         if (campoCodigoBarra.getText().trim().isEmpty()) { campoCodigoBarra.setBorder(BorderFactory.createLineBorder(Color.RED, 2)); invalido = true; }
-        if (invalido) { JOptionPane.showMessageDialog(this, "Nombre y Código de Barra son obligatorios."); return; }
-
-        String sql = "INSERT INTO activos (codigo_barra, nombre_activo, descripcion, numero_serie, valor_compra, estado) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection conexion = ConexionBaseDatos.obtenerConexion(); PreparedStatement ps = conexion.prepareStatement(sql)) {
-            ps.setString(1, campoCodigoBarra.getText().trim());
-            ps.setString(2, campoNombre.getText().trim());
-            ps.setString(3, campoDescripcion.getText().trim());
-            ps.setString(4, campoSerie.getText().trim());
-            String valorTexto = campoValorCompra.getText().trim();
-            if (valorTexto.isEmpty()) { ps.setNull(5, java.sql.Types.DECIMAL); } else { ps.setDouble(5, Double.parseDouble(valorTexto)); }
-            ps.setString(6, (String) comboEstado.getSelectedItem());
-            ps.executeUpdate();
+        if (invalido) {
+            JOptionPane.showMessageDialog(this, "Nombre y Código de Barra son obligatorios.", "Validación", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        try {
+            activosServicio.insertar(campoCodigoBarra.getText().trim(), campoNombre.getText().trim(), campoDescripcion.getText().trim(), campoSerie.getText().trim(), campoValorCompra.getText().trim(), (String) comboEstado.getSelectedItem());
+            JOptionPane.showMessageDialog(this, "Activo guardado con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             limpiarFormulario();
             cargarTabla();
-        } catch (SQLException | NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "No fue posible guardar el activo: " + ex.getMessage());
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void cargarTabla() {
         modeloTabla.setRowCount(0);
-        String sql = "SELECT codigo_barra, nombre_activo, numero_serie, estado FROM activos ORDER BY id_activo DESC";
-        try (Connection conexion = ConexionBaseDatos.obtenerConexion(); PreparedStatement ps = conexion.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                modeloTabla.addRow(new Object[]{rs.getString("codigo_barra"), rs.getString("nombre_activo"), rs.getString("numero_serie"), rs.getString("estado")});
+        try {
+            for (ActivosServicio.ActivoFila fila : activosServicio.listar()) {
+                modeloTabla.addRow(new Object[]{fila.codigo(), fila.nombre(), fila.serie(), fila.estado()});
             }
-        } catch (SQLException ex) {
-            System.err.println("Error SQL al cargar activos: " + ex.getMessage());
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
