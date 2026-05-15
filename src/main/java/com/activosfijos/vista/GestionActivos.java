@@ -50,10 +50,13 @@ public class GestionActivos extends JFrame {
         JPanel titulo = new JPanel(new BorderLayout());
         titulo.setBackground(AZUL_MEDIANOCHE);
         titulo.setBorder(new EmptyBorder(12, 16, 12, 16));
+        JButton botonRegresar = crearBotonAccion("Regresar", FontAwesomeSolid.ARROW_LEFT);
+        botonRegresar.addActionListener(e -> regresarAlMenuPrincipal());
         JLabel tituloModulo = new JLabel("Módulo de Gestión de Activos");
         tituloModulo.setForeground(UIManager.getColor("Label.foreground"));
         tituloModulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        titulo.add(tituloModulo, BorderLayout.WEST);
+        titulo.add(botonRegresar, BorderLayout.WEST);
+        titulo.add(tituloModulo, BorderLayout.CENTER);
 
         JPanel formulario = new JPanel(new GridBagLayout());
         formulario.setBorder(new EmptyBorder(20, 20, 20, 20));
@@ -98,7 +101,7 @@ public class GestionActivos extends JFrame {
         JButton botonPdf = crearBotonAccion("PDF", FontAwesomeSolid.FILE_PDF);
         JButton botonLimpiar = crearBotonAccion("Limpiar", FontAwesomeSolid.ERASER);
         JButton botonCsv = crearBotonAccion("CSV", FontAwesomeSolid.FILE_CSV);
-        JButton botonDepreciacion = crearBotonAccion("Depreciación", FontAwesomeSolid.CALCULATOR);
+        JButton botonDepreciacion = crearBotonAccion("Calcular Depreciación", FontAwesomeSolid.CALCULATOR);
 
         botonGuardar.addActionListener(e -> guardarActivo());
         botonPdf.addActionListener(e -> exportarPdf());
@@ -208,26 +211,43 @@ public class GestionActivos extends JFrame {
     private void calcularDepreciacionLineaRecta() {
         try {
             double valorCompra = Double.parseDouble(campoValorCompra.getText().trim());
-            String vidaUtilTexto = JOptionPane.showInputDialog(this, "Vida Útil (años):", "Depreciación en Línea Recta", JOptionPane.QUESTION_MESSAGE);
+            String vidaUtilTexto = JOptionPane.showInputDialog(this, "Vida Útil (en años):");
             if (vidaUtilTexto == null) {
                 return;
             }
-            String valorRescateTexto = JOptionPane.showInputDialog(this, "Valor de Rescate:", "Depreciación en Línea Recta", JOptionPane.QUESTION_MESSAGE);
+            String valorRescateTexto = JOptionPane.showInputDialog(this, "Valor de Rescate:");
             if (valorRescateTexto == null) {
                 return;
             }
             int vidaUtil = Integer.parseInt(vidaUtilTexto.trim());
             double valorRescate = Double.parseDouble(valorRescateTexto.trim());
-            if (vidaUtil <= 0 || valorCompra < 0 || valorRescate < 0 || valorRescate >= valorCompra) {
-                JOptionPane.showMessageDialog(this, "Verifica los valores ingresados para realizar el cálculo.", "Datos inválidos", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-            double depreciacionAnual = (valorCompra - valorRescate) / vidaUtil;
-            String resumen = String.format("Valor de Compra: %.2f%nValor de Rescate: %.2f%nVida Útil: %d años%nDepreciación Anual: %.2f", valorCompra, valorRescate, vidaUtil, depreciacionAnual);
-            JOptionPane.showMessageDialog(this, resumen, "Resultado de Depreciación", JOptionPane.INFORMATION_MESSAGE);
+            double depreciacionAnual = activosServicio.calcularDepreciacionLineaRecta(valorCompra, valorRescate, vidaUtil);
+            String mensaje = String.format("Depreciación anual: $%,.2f", depreciacionAnual);
+            JOptionPane.showMessageDialog(this, mensaje, "Resultado de Depreciación", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IllegalArgumentException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Datos inválidos", JOptionPane.WARNING_MESSAGE);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Ingresa un valor de compra, vida útil y valor de rescate válidos.", "Datos inválidos", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Ingresa números válidos para el cálculo de depreciación.", "Datos inválidos", JOptionPane.WARNING_MESSAGE);
         }
+    }
+
+    private void regresarAlMenuPrincipal() {
+        Window menu = buscarMenuPrincipal();
+        dispose();
+        if (menu != null) {
+            menu.setVisible(true);
+            menu.toFront();
+            menu.requestFocus();
+        }
+    }
+
+    private Window buscarMenuPrincipal() {
+        for (Window ventana : Window.getWindows()) {
+            if (ventana instanceof MenuPrincipal) {
+                return ventana;
+            }
+        }
+        return null;
     }
 
     private void guardarActivo() {
