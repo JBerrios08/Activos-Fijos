@@ -21,4 +21,14 @@ public final class ConexionBaseDatos {
     public static Connection obtenerConexion() throws SQLException {
         return DriverManager.getConnection(URL, USUARIO, CLAVE);
     }
+
+    public static void cerrarSilencioso(AutoCloseable recurso) {
+        if (recurso != null) {
+            try {
+                recurso.close();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
 }

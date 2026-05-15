@@ -95,7 +95,7 @@ public class GestionActivos extends JFrame {
         acciones.setBorder(new EmptyBorder(0, 0, 8, 8));
 
         JButton botonGuardar = crearBotonAccion("Guardar", FontAwesomeSolid.SAVE);
-        JButton botonEliminar = crearBotonAccion("Eliminar", FontAwesomeSolid.TRASH);
+        JButton botonEliminar = crearBotonAccion("Eliminar", FontAwesomeSolid.TRASH_ALT);
         JButton botonBuscar = crearBotonAccion("Buscar", FontAwesomeSolid.SEARCH);
 
         botonGuardar.addActionListener(e -> guardarActivo());
@@ -114,7 +114,7 @@ public class GestionActivos extends JFrame {
         principal.add(acciones, BorderLayout.SOUTH);
 
         setContentPane(principal);
-        cargarActivos();
+        cargarTabla();
     }
 
     private void agregarCampo(JPanel panel, GridBagConstraints gbc, int fila, String etiqueta, JComponent componente) {
@@ -181,7 +181,7 @@ public class GestionActivos extends JFrame {
             return;
         }
 
-        String sql = "INSERT INTO activos (codigo_barra, nombre, descripcion, serie, valor_compra, estado) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO activos (codigo_barra, nombre_activo, descripcion, numero_serie, valor_compra, estado) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conexion = ConexionBaseDatos.obtenerConexion();
              PreparedStatement ps = conexion.prepareStatement(sql)) {
@@ -193,9 +193,10 @@ public class GestionActivos extends JFrame {
 
             String valorTexto = campoValorCompra.getText().trim();
             if (valorTexto.isEmpty()) {
-                ps.setBigDecimal(5, null);
+                ps.setNull(5, java.sql.Types.DECIMAL);
             } else {
-                ps.setBigDecimal(5, new java.math.BigDecimal(valorTexto));
+                double valorCompra = Double.parseDouble(valorTexto);
+                ps.setDouble(5, valorCompra);
             }
 
             ps.setString(6, (String) comboEstado.getSelectedItem());
@@ -203,19 +204,20 @@ public class GestionActivos extends JFrame {
 
             JOptionPane.showMessageDialog(this, "Activo guardado correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             limpiarFormulario();
-            cargarActivos();
+            cargarTabla();
         } catch (SQLException ex) {
             System.err.println("Error SQL al guardar activo: " + ex.getMessage());
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "No fue posible guardar el activo.", "Error", JOptionPane.ERROR_MESSAGE);
         } catch (NumberFormatException ex) {
+            ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Valor de compra inválido.", "Validación", JOptionPane.WARNING_MESSAGE);
         }
     }
 
-    private void cargarActivos() {
+    private void cargarTabla() {
         modeloTabla.setRowCount(0);
-        String sql = "SELECT codigo_barra, nombre, serie, estado FROM activos ORDER BY id_activo DESC";
+        String sql = "SELECT codigo_barra, nombre_activo, numero_serie, estado FROM activos ORDER BY id_activo DESC";
 
         try (Connection conexion = ConexionBaseDatos.obtenerConexion();
              PreparedStatement ps = conexion.prepareStatement(sql);
@@ -224,8 +226,8 @@ public class GestionActivos extends JFrame {
             while (rs.next()) {
                 Object[] fila = {
                         rs.getString("codigo_barra"),
-                        rs.getString("nombre"),
-                        rs.getString("serie"),
+                        rs.getString("nombre_activo"),
+                        rs.getString("numero_serie"),
                         rs.getString("estado")
                 };
                 modeloTabla.addRow(fila);
@@ -254,7 +256,7 @@ public class GestionActivos extends JFrame {
 
         @Override
         public Insets getBorderInsets(Component c) {
-            return new Insets(8, 14, 8, 14);
+            return new Insets(8, 16, 8, 16);
         }
 
         @Override
