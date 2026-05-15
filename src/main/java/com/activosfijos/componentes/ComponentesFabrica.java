@@ -2,6 +2,7 @@ package com.activosfijos.componentes;
 
 import com.activosfijos.util.TemaVisual;
 import org.kordamp.ikonli.Ikon;
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import javax.swing.*;
@@ -17,21 +18,59 @@ public final class ComponentesFabrica {
         boton.setHorizontalTextPosition(SwingConstants.RIGHT);
         boton.setIconTextGap(8);
         boton.setFocusPainted(false);
-        boton.setBackground(UIManager.getColor("Button.background"));
-        boton.setForeground(UIManager.getColor("Button.foreground"));
+        boton.setContentAreaFilled(true);
+        boton.setOpaque(true);
+        boton.setBackground(TemaVisual.AZUL_INSTITUCIONAL);
+        boton.setForeground(TemaVisual.GRIS_CLARO);
         boton.setBorder(new BordeRedondeado(12));
+        boton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                boton.setBackground(TemaVisual.AZUL_CLARO);
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                boton.setBackground(TemaVisual.AZUL_INSTITUCIONAL);
+            }
+        });
         return boton;
     }
 
     public static JButton crearBotonPrimario(String texto) {
         JButton boton = new JButton(texto);
-        boton.setBackground(UIManager.getColor("Button.default.background"));
-        boton.setForeground(UIManager.getColor("Button.default.foreground"));
+        boton.setContentAreaFilled(true);
+        boton.setOpaque(true);
+        boton.setBackground(TemaVisual.AZUL_CLARO);
+        boton.setForeground(TemaVisual.GRIS_CLARO);
         boton.setFocusPainted(false);
         boton.setFont(new Font("Segoe UI", Font.BOLD, 15));
         boton.setBorder(new BordeRedondeado(12));
+        boton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                boton.setBackground(TemaVisual.AZUL_INSTITUCIONAL);
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                boton.setBackground(TemaVisual.AZUL_CLARO);
+            }
+        });
         return boton;
     }
+
+    public static JButton crearBotonRegresar() { return crearBotonConIcono("Regresar", FontAwesomeSolid.ARROW_LEFT); }
+    public static JButton crearBotonGuardar() { return crearBotonConIcono("Guardar", FontAwesomeSolid.SAVE); }
+    public static JButton crearBotonModificar() { return crearBotonConIcono("Modificar", FontAwesomeSolid.EDIT); }
+    public static JButton crearBotonEliminar() { return crearBotonConIcono("Eliminar", FontAwesomeSolid.TRASH_ALT); }
+    public static JButton crearBotonPdf() { return crearBotonConIcono("PDF", FontAwesomeSolid.FILE_PDF); }
+    public static JButton crearBotonLimpiar() { return crearBotonConIcono("Limpiar", FontAwesomeSolid.ERASER); }
+    public static JButton crearBotonCsv() { return crearBotonConIcono("CSV", FontAwesomeSolid.FILE_CSV); }
+    public static JButton crearBotonDepreciacion() { return crearBotonConIcono("Calcular Depreciación", FontAwesomeSolid.CALCULATOR); }
+    public static JButton crearBotonCrearUsuario() { return crearBotonConIcono("Crear", FontAwesomeSolid.USER_PLUS); }
+    public static JButton crearBotonEditarUsuario() { return crearBotonConIcono("Editar", FontAwesomeSolid.SEARCH); }
+    public static JButton crearBotonCrearCuenta() { return crearBotonEnlaceConIcono("Crear Cuenta", FontAwesomeSolid.USER_PLUS); }
 
     public static JButton crearBotonEnlaceConIcono(String texto, Ikon icono) {
         JButton boton = new JButton(texto, FontIcon.of(icono, 14, TemaVisual.AZUL_INSTITUCIONAL));

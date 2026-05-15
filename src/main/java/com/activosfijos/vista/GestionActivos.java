@@ -4,7 +4,6 @@ import com.activosfijos.componentes.ComponentesFabrica;
 import com.activosfijos.servicio.ActivosServicio;
 import com.activosfijos.servicio.ReportesServicio;
 import com.activosfijos.util.TemaVisual;
-import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -58,7 +57,7 @@ public class GestionActivos extends JFrame {
         JPanel titulo = new JPanel(new BorderLayout());
         titulo.setBackground(TemaVisual.AZUL_INSTITUCIONAL);
         titulo.setBorder(new EmptyBorder(12, 16, 12, 16));
-        JButton botonRegresar = ComponentesFabrica.crearBotonConIcono("Regresar", FontAwesomeSolid.ARROW_LEFT);
+        JButton botonRegresar = ComponentesFabrica.crearBotonRegresar();
         botonRegresar.addActionListener(e -> regresarAlMenuPrincipal());
         JLabel tituloModulo = ComponentesFabrica.crearTituloSeccion("Módulo de Gestión de Activos", 20, UIManager.getColor("Label.foreground"));
         titulo.add(botonRegresar, BorderLayout.WEST);
@@ -68,16 +67,22 @@ public class GestionActivos extends JFrame {
 
     private JPanel crearCentro() {
         JPanel centro = new JPanel(new BorderLayout(8, 8));
-        centro.add(crearFormulario(), BorderLayout.NORTH);
-        centro.add(new JScrollPane(crearTablaActivos()), BorderLayout.CENTER);
+        JPanel formulario = crearFormulario();
+        JScrollPane scrollTabla = new JScrollPane(crearTablaActivos());
+        scrollTabla.setPreferredSize(new Dimension(0, 320));
+        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, formulario, scrollTabla);
+        split.setResizeWeight(0.5);
+        split.setDividerSize(6);
+        split.setBorder(null);
+        centro.add(split, BorderLayout.CENTER);
         return centro;
     }
 
     private JPanel crearFormulario() {
         JPanel formulario = new JPanel(new GridBagLayout());
-        formulario.setBorder(new EmptyBorder(20, 20, 20, 20));
+        formulario.setBorder(new EmptyBorder(8, 12, 8, 12));
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.insets = new Insets(4, 8, 4, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         campoCodigoBarra = ComponentesFabrica.crearCampoTexto(20);
@@ -134,13 +139,13 @@ public class GestionActivos extends JFrame {
 
     private JPanel crearAcciones() {
         JPanel acciones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 8));
-        JButton botonGuardar = ComponentesFabrica.crearBotonConIcono("Guardar", FontAwesomeSolid.SAVE);
-        JButton botonModificar = ComponentesFabrica.crearBotonConIcono("Modificar", FontAwesomeSolid.EDIT);
-        JButton botonEliminar = ComponentesFabrica.crearBotonConIcono("Eliminar", FontAwesomeSolid.TRASH_ALT);
-        JButton botonPdf = ComponentesFabrica.crearBotonConIcono("PDF", FontAwesomeSolid.FILE_PDF);
-        JButton botonLimpiar = ComponentesFabrica.crearBotonConIcono("Limpiar", FontAwesomeSolid.ERASER);
-        JButton botonCsv = ComponentesFabrica.crearBotonConIcono("CSV", FontAwesomeSolid.FILE_CSV);
-        JButton botonDepreciacion = ComponentesFabrica.crearBotonConIcono("Calcular Depreciación", FontAwesomeSolid.CALCULATOR);
+        JButton botonGuardar = ComponentesFabrica.crearBotonGuardar();
+        JButton botonModificar = ComponentesFabrica.crearBotonModificar();
+        JButton botonEliminar = ComponentesFabrica.crearBotonEliminar();
+        JButton botonPdf = ComponentesFabrica.crearBotonPdf();
+        JButton botonLimpiar = ComponentesFabrica.crearBotonLimpiar();
+        JButton botonCsv = ComponentesFabrica.crearBotonCsv();
+        JButton botonDepreciacion = ComponentesFabrica.crearBotonDepreciacion();
 
         botonGuardar.addActionListener(e -> guardarActivo());
         botonModificar.addActionListener(e -> modificarActivo());
