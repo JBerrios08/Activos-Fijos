@@ -1,26 +1,25 @@
 package com.activosfijos.vista;
 
-import com.activosfijos.servicio.ReportesServicio;
 import com.activosfijos.servicio.ActivosServicio;
+import com.activosfijos.servicio.ReportesServicio;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableRowSorter;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.io.File;
 
 public class GestionActivos extends JFrame {
 
     private static final Color AZUL_MEDIANOCHE = Color.decode("#2C3E50");
-    private static final Color BLANCO_NIEVE = Color.decode("#ECF0F1");
     private static final Color AZUL_ELECTRICO = Color.decode("#3498DB");
 
     private final ReportesServicio reportesServicio = new ReportesServicio();
@@ -46,19 +45,17 @@ public class GestionActivos extends JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         JPanel principal = new JPanel(new BorderLayout(12, 12));
-        principal.setBackground(BLANCO_NIEVE);
         principal.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         JPanel titulo = new JPanel(new BorderLayout());
         titulo.setBackground(AZUL_MEDIANOCHE);
         titulo.setBorder(new EmptyBorder(12, 16, 12, 16));
-        titulo.add(new JLabel("Módulo de Gestión de Activos") {{
-            setForeground(Color.WHITE);
-            setFont(new Font("Segoe UI", Font.BOLD, 20));
-        }}, BorderLayout.WEST);
+        JLabel tituloModulo = new JLabel("Módulo de Gestión de Activos");
+        tituloModulo.setForeground(UIManager.getColor("Label.foreground"));
+        tituloModulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        titulo.add(tituloModulo, BorderLayout.WEST);
 
         JPanel formulario = new JPanel(new GridBagLayout());
-        formulario.setBackground(BLANCO_NIEVE);
         formulario.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -96,22 +93,24 @@ public class GestionActivos extends JFrame {
         JScrollPane scroll = new JScrollPane(tablaActivos);
 
         JPanel acciones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 8));
-        acciones.setBackground(BLANCO_NIEVE);
 
         JButton botonGuardar = crearBotonAccion("Guardar", FontAwesomeSolid.SAVE);
         JButton botonPdf = crearBotonAccion("PDF", FontAwesomeSolid.FILE_PDF);
-        JButton botonEliminar = crearBotonAccion("Eliminar", FontAwesomeSolid.TRASH_ALT);
-        JButton botonCsv = crearBotonAccion("Buscar", FontAwesomeSolid.SEARCH);
+        JButton botonLimpiar = crearBotonAccion("Limpiar", FontAwesomeSolid.ERASER);
+        JButton botonCsv = crearBotonAccion("CSV", FontAwesomeSolid.FILE_CSV);
+        JButton botonDepreciacion = crearBotonAccion("Depreciación", FontAwesomeSolid.CALCULATOR);
 
         botonGuardar.addActionListener(e -> guardarActivo());
         botonPdf.addActionListener(e -> exportarPdf());
-        botonEliminar.addActionListener(e -> limpiarFormulario());
+        botonLimpiar.addActionListener(e -> limpiarFormulario());
         botonCsv.addActionListener(e -> exportarCsv());
+        botonDepreciacion.addActionListener(e -> calcularDepreciacionLineaRecta());
 
         acciones.add(botonGuardar);
         acciones.add(botonPdf);
-        acciones.add(botonEliminar);
+        acciones.add(botonLimpiar);
         acciones.add(botonCsv);
+        acciones.add(botonDepreciacion);
 
         campoBuscar.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) { filtrarTabla(); }
@@ -120,7 +119,6 @@ public class GestionActivos extends JFrame {
         });
 
         JPanel centro = new JPanel(new BorderLayout(8, 8));
-        centro.setBackground(BLANCO_NIEVE);
         centro.add(formulario, BorderLayout.NORTH);
         centro.add(scroll, BorderLayout.CENTER);
 
@@ -155,7 +153,7 @@ public class GestionActivos extends JFrame {
         tabla.setDefaultRenderer(Object.class, new EstadoRenderer());
         JTableHeader header = tabla.getTableHeader();
         header.setBackground(AZUL_MEDIANOCHE);
-        header.setForeground(Color.WHITE);
+        header.setForeground(UIManager.getColor("Label.foreground"));
         return tabla;
     }
 
@@ -187,25 +185,63 @@ public class GestionActivos extends JFrame {
 
     private void agregarCampo(JPanel panel, GridBagConstraints gbc, int fila, String etiqueta, JComponent componente) {
         if (!etiqueta.isBlank()) {
-            gbc.gridx = 0; gbc.gridy = fila; gbc.weightx = 0.2;
+            gbc.gridx = 0;
+            gbc.gridy = fila;
+            gbc.weightx = 0.2;
             panel.add(new JLabel(etiqueta), gbc);
         }
-        gbc.gridx = 1; gbc.gridy = fila; gbc.weightx = 0.8; panel.add(componente, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = fila;
+        gbc.weightx = 0.8;
+        panel.add(componente, gbc);
     }
 
     private JButton crearBotonAccion(String texto, FontAwesomeSolid icono) {
-        JButton boton = new JButton(texto, FontIcon.of(icono, 14, Color.WHITE));
+        JButton boton = new JButton(texto, FontIcon.of(icono, 14));
+        boton.setHorizontalTextPosition(SwingConstants.RIGHT);
+        boton.setIconTextGap(8);
         boton.setBackground(AZUL_ELECTRICO);
-        boton.setForeground(Color.WHITE);
+        boton.setForeground(UIManager.getColor("Button.foreground"));
         return boton;
+    }
+
+    private void calcularDepreciacionLineaRecta() {
+        try {
+            double valorCompra = Double.parseDouble(campoValorCompra.getText().trim());
+            String vidaUtilTexto = JOptionPane.showInputDialog(this, "Vida Útil (años):", "Depreciación en Línea Recta", JOptionPane.QUESTION_MESSAGE);
+            if (vidaUtilTexto == null) {
+                return;
+            }
+            String valorRescateTexto = JOptionPane.showInputDialog(this, "Valor de Rescate:", "Depreciación en Línea Recta", JOptionPane.QUESTION_MESSAGE);
+            if (valorRescateTexto == null) {
+                return;
+            }
+            int vidaUtil = Integer.parseInt(vidaUtilTexto.trim());
+            double valorRescate = Double.parseDouble(valorRescateTexto.trim());
+            if (vidaUtil <= 0 || valorCompra < 0 || valorRescate < 0 || valorRescate >= valorCompra) {
+                JOptionPane.showMessageDialog(this, "Verifica los valores ingresados para realizar el cálculo.", "Datos inválidos", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            double depreciacionAnual = (valorCompra - valorRescate) / vidaUtil;
+            String resumen = String.format("Valor de Compra: %.2f%nValor de Rescate: %.2f%nVida Útil: %d años%nDepreciación Anual: %.2f", valorCompra, valorRescate, vidaUtil, depreciacionAnual);
+            JOptionPane.showMessageDialog(this, resumen, "Resultado de Depreciación", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Ingresa un valor de compra, vida útil y valor de rescate válidos.", "Datos inválidos", JOptionPane.WARNING_MESSAGE);
+        }
     }
 
     private void guardarActivo() {
         boolean invalido = false;
         campoNombre.setBorder(bordeNombreOriginal);
         campoCodigoBarra.setBorder(bordeCodigoOriginal);
-        if (campoNombre.getText().trim().isEmpty()) { campoNombre.setBorder(BorderFactory.createLineBorder(Color.RED, 2)); invalido = true; }
-        if (campoCodigoBarra.getText().trim().isEmpty()) { campoCodigoBarra.setBorder(BorderFactory.createLineBorder(Color.RED, 2)); invalido = true; }
+        if (campoNombre.getText().trim().isEmpty()) {
+            campoNombre.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+            invalido = true;
+        }
+        if (campoCodigoBarra.getText().trim().isEmpty()) {
+            campoCodigoBarra.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+            invalido = true;
+        }
         if (invalido) {
             JOptionPane.showMessageDialog(this, "Nombre y Código de Barra son obligatorios.", "Validación", JOptionPane.WARNING_MESSAGE);
             return;
@@ -232,7 +268,12 @@ public class GestionActivos extends JFrame {
     }
 
     private void limpiarFormulario() {
-        campoCodigoBarra.setText(""); campoNombre.setText(""); campoDescripcion.setText(""); campoSerie.setText(""); campoValorCompra.setText(""); comboEstado.setSelectedIndex(0);
+        campoCodigoBarra.setText("");
+        campoNombre.setText("");
+        campoDescripcion.setText("");
+        campoSerie.setText("");
+        campoValorCompra.setText("");
+        comboEstado.setSelectedIndex(0);
         actualizarIva();
     }
 
@@ -243,9 +284,13 @@ public class GestionActivos extends JFrame {
             int modelRow = table.convertRowIndexToModel(row);
             String estado = String.valueOf(table.getModel().getValueAt(modelRow, 3));
             if (!isSelected) {
-                if ("Mantenimiento".equalsIgnoreCase(estado)) c.setBackground(new Color(255, 248, 196));
-                else if ("Baja".equalsIgnoreCase(estado)) c.setBackground(new Color(255, 220, 220));
-                else c.setBackground(Color.WHITE);
+                if ("Mantenimiento".equalsIgnoreCase(estado)) {
+                    c.setBackground(new Color(255, 248, 196));
+                } else if ("Baja".equalsIgnoreCase(estado)) {
+                    c.setBackground(new Color(255, 220, 220));
+                } else {
+                    c.setBackground(UIManager.getColor("Table.background"));
+                }
             }
             return c;
         }

@@ -1,25 +1,24 @@
 package com.activosfijos.vista;
 
-import com.activosfijos.servicio.GraficosServicio;
 import com.activosfijos.servicio.EstadosServicio;
-import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
-import org.kordamp.ikonli.swing.FontIcon;
+import com.activosfijos.servicio.GraficosServicio;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.swing.FontIcon;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.io.File;
-import java.util.Map;
 
 public class MenuPrincipal extends JFrame {
     private static final Color AZUL_MEDIANOCHE = Color.decode("#2C3E50");
-    private static final Color BLANCO_NIEVE = Color.decode("#ECF0F1");
     private static final Color AZUL_ELECTRICO = Color.decode("#3498DB");
-    private boolean modoOscuro = false;
+    private boolean modoOscuro;
     private final EstadosServicio estadosServicio = new EstadosServicio();
+    private final GraficosServicio graficosServicio = new GraficosServicio();
 
     public MenuPrincipal(String usuario, String rol) {
         setTitle("Activos Fijos - Menú Principal");
@@ -28,7 +27,6 @@ public class MenuPrincipal extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         JPanel principal = new JPanel(new BorderLayout(12, 12));
-        principal.setBackground(BLANCO_NIEVE);
         principal.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         JPanel cabecera = new JPanel(new BorderLayout());
@@ -36,7 +34,7 @@ public class MenuPrincipal extends JFrame {
         cabecera.setBorder(new EmptyBorder(12, 16, 12, 16));
 
         JLabel bienvenida = new JLabel(" Usuario: " + usuario + "  |  Rol: " + rol);
-        bienvenida.setForeground(Color.WHITE);
+        bienvenida.setForeground(UIManager.getColor("Label.foreground"));
 
         JButton botonTema = crearBoton("Modo Claro/Oscuro", FontAwesomeSolid.ADJUST);
         botonTema.addActionListener(e -> alternarTema());
@@ -53,11 +51,9 @@ public class MenuPrincipal extends JFrame {
         cabecera.add(panelDerechaCabecera, BorderLayout.EAST);
 
         JPanel centro = new JPanel(new BorderLayout(20, 20));
-        centro.setBackground(BLANCO_NIEVE);
-
         JPanel acciones = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 20));
-        acciones.setBackground(BLANCO_NIEVE);
-        JButton botonGestion = crearBoton("Ir a Gestión de Activos", FontAwesomeSolid.SEARCH);
+
+        JButton botonGestion = crearBoton("Ir a Gestión de Activos", FontAwesomeSolid.TOOLS);
         botonGestion.addActionListener(e -> new GestionActivos().setVisible(true));
         acciones.add(botonGestion);
 
@@ -67,7 +63,7 @@ public class MenuPrincipal extends JFrame {
             acciones.add(botonUsuarios);
         }
 
-        JPanel graficoPanel = new GraficosServicio().crearGraficoEstados(estadosServicio.obtenerEstados());
+        JPanel graficoPanel = estadosServicio.noHayActivosRegistrados() ? graficosServicio.crearPanelSinDatos() : graficosServicio.crearGraficoEstados(estadosServicio.obtenerEstados());
         graficoPanel.setBorder(BorderFactory.createTitledBorder("Resumen de estados"));
 
         centro.add(acciones, BorderLayout.NORTH);
@@ -77,7 +73,6 @@ public class MenuPrincipal extends JFrame {
         principal.add(centro, BorderLayout.CENTER);
         setContentPane(principal);
     }
-
 
     private void ejecutarBackup() {
         try {
@@ -99,16 +94,20 @@ public class MenuPrincipal extends JFrame {
                 UIManager.setLookAndFeel(new FlatDarkLaf());
             }
             modoOscuro = !modoOscuro;
-            SwingUtilities.updateComponentTreeUI(this);
+            for (Window ventana : Window.getWindows()) {
+                SwingUtilities.updateComponentTreeUI(ventana);
+            }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "No fue posible cambiar el tema: " + ex.getMessage());
         }
     }
 
     private JButton crearBoton(String texto, FontAwesomeSolid icono) {
-        JButton boton = new JButton(texto, FontIcon.of(icono, 14, Color.WHITE));
+        JButton boton = new JButton(texto, FontIcon.of(icono, 14));
+        boton.setHorizontalTextPosition(SwingConstants.RIGHT);
+        boton.setIconTextGap(8);
         boton.setBackground(AZUL_ELECTRICO);
-        boton.setForeground(Color.WHITE);
+        boton.setForeground(UIManager.getColor("Button.foreground"));
         boton.setBorder(new RoundedBorder(12));
         return boton;
     }
