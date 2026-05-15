@@ -77,6 +77,15 @@ public class FormularioLogin extends JFrame {
         botonIngresar.setFont(new Font("Segoe UI", Font.BOLD, 15));
         botonIngresar.addActionListener(e -> iniciarSesion());
 
+        JButton botonRegistro = new JButton("¿No tienes cuenta? Regístrate aquí");
+        botonRegistro.setBorderPainted(false);
+        botonRegistro.setContentAreaFilled(false);
+        botonRegistro.setFocusPainted(false);
+        botonRegistro.setForeground(AZUL_ELECTRICO);
+        botonRegistro.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        botonRegistro.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        botonRegistro.addActionListener(e -> new RegistroUsuario().setVisible(true));
+
         gbc.gridx = 0;
         gbc.gridy = 0;
         formulario.add(etiquetaUsuario, gbc);
@@ -92,6 +101,9 @@ public class FormularioLogin extends JFrame {
 
         gbc.gridy = 4;
         formulario.add(botonIngresar, gbc);
+
+        gbc.gridy = 5;
+        formulario.add(botonRegistro, gbc);
 
         panelLogin.add(formulario);
 
