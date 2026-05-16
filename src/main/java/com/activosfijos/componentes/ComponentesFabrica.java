@@ -8,6 +8,7 @@ import org.kordamp.ikonli.swing.FontIcon;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public final class ComponentesFabrica {
@@ -39,6 +40,57 @@ public final class ComponentesFabrica {
         boton.setBorder(new BordeRedondeado(12));
         boton.addActionListener(e -> AudioServicio.reproducirClick());
         return boton;
+    }
+
+    public static JButton crearBotonIngresar() {
+        return crearBotonConIcono("Ingresar", FontAwesomeSolid.SIGN_IN_ALT);
+    }
+
+    public static JButton crearBotonRegistrarse() {
+        return crearBotonConIcono("Registrarse", FontAwesomeSolid.USER_PLUS);
+    }
+
+    public static JPanel crearCampoUsuario() {
+        return crearCampoConIcono(new JTextField(20), FontAwesomeSolid.USER);
+    }
+
+    public static JPanel crearCampoContrasena() {
+        return crearCampoConIcono(new JPasswordField(20), FontAwesomeSolid.LOCK);
+    }
+
+    public static JPanel crearCampoRol(String[] opciones) {
+        return crearCampoConIcono(new JComboBox<>(opciones), FontAwesomeSolid.USER_TAG);
+    }
+
+    public static JTextField extraerCampoTexto(JPanel contenedorCampo) {
+        return (JTextField) contenedorCampo.getClientProperty("campoEntrada");
+    }
+
+    public static JPasswordField extraerCampoClave(JPanel contenedorCampo) {
+        return (JPasswordField) contenedorCampo.getClientProperty("campoEntrada");
+    }
+
+    public static JComboBox<String> extraerCampoRol(JPanel contenedorCampo) {
+        return (JComboBox<String>) contenedorCampo.getClientProperty("campoEntrada");
+    }
+
+    private static JPanel crearCampoConIcono(JComponent campo, Ikon icono) {
+        JPanel contenedor = new JPanel(new BorderLayout(8, 0));
+        contenedor.setOpaque(true);
+        contenedor.setBackground(UIManager.getColor("TextField.background"));
+        contenedor.setBorder(BorderFactory.createCompoundBorder(new BordeRedondeado(12), new EmptyBorder(8, 12, 8, 12)));
+
+        JLabel etiquetaIcono = new JLabel(FontIcon.of(icono, 14, TemaVisual.AZUL_INSTITUCIONAL));
+        etiquetaIcono.setBorder(new EmptyBorder(0, 2, 0, 0));
+
+        campo.setBorder(BorderFactory.createEmptyBorder());
+        campo.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        campo.setOpaque(false);
+
+        contenedor.add(etiquetaIcono, BorderLayout.WEST);
+        contenedor.add(campo, BorderLayout.CENTER);
+        contenedor.putClientProperty("campoEntrada", campo);
+        return contenedor;
     }
 
     public static JButton crearBotonRegresar() { return crearBotonConIcono("Regresar", FontAwesomeSolid.ARROW_LEFT); }
