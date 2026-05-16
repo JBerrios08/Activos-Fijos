@@ -143,7 +143,15 @@ public class MenuPrincipal extends JFrame {
 
 
     private void actualizarLogoPorTema() {
-        ImageIcon icono = new ImageIcon(getClass().getResource(TemaVisual.rutaLogoSegunTema()));
+        java.net.URL rutaLogo = getClass().getResource(TemaVisual.rutaLogoSegunTema());
+        if (rutaLogo == null) {
+            etiquetaLogo.setIcon(null);
+            etiquetaLogo.setText("UNAB Activos");
+            etiquetaLogo.setForeground(UIManager.getColor("Label.foreground"));
+            return;
+        }
+        etiquetaLogo.setText("");
+        ImageIcon icono = new ImageIcon(rutaLogo);
         Image escalada = icono.getImage().getScaledInstance(150, 46, Image.SCALE_SMOOTH);
         etiquetaLogo.setIcon(new ImageIcon(escalada));
     }
