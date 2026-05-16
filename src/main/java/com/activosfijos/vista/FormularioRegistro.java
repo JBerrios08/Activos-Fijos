@@ -1,13 +1,13 @@
 package com.activosfijos.vista;
 
+import com.activosfijos.componentes.ComponentesFabrica;
 import com.activosfijos.util.ConexionBaseDatos;
 import com.activosfijos.util.TemaVisual;
-import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
-import org.kordamp.ikonli.swing.FontIcon;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -18,65 +18,85 @@ public class FormularioRegistro extends JFrame {
     private final JPasswordField campoClave;
     private final JComboBox<String> comboRol;
     private final JFrame loginFrame;
+    private final JLabel etiquetaLogo = new JLabel();
 
     public FormularioRegistro(JFrame loginFrame) {
         this.loginFrame = loginFrame;
 
         setTitle("Registro de Usuario");
-        setSize(500, 360);
+        setSize(560, 520);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        JPanel campoUsuarioUI = ComponentesFabrica.crearCampoUsuario();
+        JPanel campoClaveUI = ComponentesFabrica.crearCampoContrasena();
+        JPanel campoRolUI = ComponentesFabrica.crearCampoRol(new String[]{"operador", "administrador"});
+        campoNombreUsuario = ComponentesFabrica.extraerCampoTexto(campoUsuarioUI);
+        campoClave = ComponentesFabrica.extraerCampoClave(campoClaveUI);
+        comboRol = ComponentesFabrica.extraerCampoRol(campoRolUI);
+
+        setContentPane(crearPanelPrincipal(campoUsuarioUI, campoClaveUI, campoRolUI));
+        actualizarLogoPorTema();
+    }
+
+    private JPanel crearPanelPrincipal(JPanel campoUsuarioUI, JPanel campoClaveUI, JPanel campoRolUI) {
+        JPanel panelBase = new JPanel(new GridBagLayout());
+        panelBase.setBorder(new EmptyBorder(20, 24, 20, 24));
+
+        JPanel formulario = new JPanel(new GridBagLayout());
+        formulario.setBorder(new EmptyBorder(10, 24, 10, 24));
+        formulario.setPreferredSize(new Dimension(430, 420));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 8, 10, 8);
+        gbc.gridx = 0;
+        gbc.weightx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(12, 0, 12, 0);
 
+        etiquetaLogo.setHorizontalAlignment(SwingConstants.CENTER);
         JLabel titulo = new JLabel("Crear nueva cuenta");
         titulo.setForeground(TemaVisual.AZUL_INSTITUCIONAL);
         titulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        titulo.setHorizontalAlignment(SwingConstants.CENTER);
 
-        campoNombreUsuario = new JTextField(20);
-        campoClave = new JPasswordField(20);
-        comboRol = new JComboBox<>(new String[]{"operador", "administrador"});
-
-        JButton botonRegistrar = new JButton("Registrar", FontIcon.of(FontAwesomeSolid.USER_PLUS, 14, Color.WHITE));
-        botonRegistrar.setBackground(UIManager.getColor("Button.default.background"));
-        botonRegistrar.setForeground(UIManager.getColor("Button.default.foreground"));
-        botonRegistrar.setFocusPainted(false);
+        JButton botonRegistrar = ComponentesFabrica.crearBotonRegistrarse();
         botonRegistrar.addActionListener(e -> registrarUsuario());
 
-        gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        panel.add(titulo, gbc);
-
-        gbc.gridwidth = 1;
+        formulario.add(etiquetaLogo, gbc);
         gbc.gridy = 1;
-        panel.add(new JLabel("Nombre de usuario"), gbc);
-        gbc.gridx = 1;
-        panel.add(campoNombreUsuario, gbc);
-
-        gbc.gridx = 0;
+        formulario.add(titulo, gbc);
         gbc.gridy = 2;
-        panel.add(new JLabel("Clave"), gbc);
-        gbc.gridx = 1;
-        panel.add(campoClave, gbc);
-
-        gbc.gridx = 0;
+        formulario.add(ComponentesFabrica.crearEtiquetaFormulario("Nombre de usuario"), gbc);
         gbc.gridy = 3;
-        panel.add(new JLabel("Rol"), gbc);
-        gbc.gridx = 1;
-        panel.add(comboRol, gbc);
-
-        gbc.gridx = 0;
+        formulario.add(campoUsuarioUI, gbc);
         gbc.gridy = 4;
-        gbc.gridwidth = 2;
-        panel.add(botonRegistrar, gbc);
+        formulario.add(ComponentesFabrica.crearEtiquetaFormulario("Clave"), gbc);
+        gbc.gridy = 5;
+        formulario.add(campoClaveUI, gbc);
+        gbc.gridy = 6;
+        formulario.add(ComponentesFabrica.crearEtiquetaFormulario("Rol"), gbc);
+        gbc.gridy = 7;
+        formulario.add(campoRolUI, gbc);
+        gbc.gridy = 8;
+        formulario.add(botonRegistrar, gbc);
 
-        setContentPane(panel);
+        panelBase.add(formulario);
+        return panelBase;
+    }
+
+    private void actualizarLogoPorTema() {
+        URL rutaLogo = getClass().getResource(TemaVisual.esModoOscuroActivo() ? "/imagenes/logo_unab_oscuro.png" : "/imagenes/logo_unab_claro.png");
+        if (rutaLogo == null) {
+            etiquetaLogo.setText("UNAB");
+            etiquetaLogo.setForeground(TemaVisual.AZUL_INSTITUCIONAL);
+            etiquetaLogo.setIcon(null);
+            return;
+        }
+        etiquetaLogo.setText("");
+        ImageIcon icono = new ImageIcon(rutaLogo);
+        Image escalada = icono.getImage().getScaledInstance(220, 72, Image.SCALE_SMOOTH);
+        etiquetaLogo.setIcon(new ImageIcon(escalada));
     }
 
     private void registrarUsuario() {
