@@ -3,33 +3,35 @@ package com.activosfijos.servicio;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public final class AudioServicio {
+    private static final ExecutorService EJECUTOR_AUDIO = Executors.newSingleThreadExecutor(r -> {
+        Thread hilo = new Thread(r, "audio-click-boton");
+        hilo.setDaemon(true);
+        return hilo;
+    });
+
     private AudioServicio() {
     }
 
     public static void reproducirClick() {
-        Thread hilo = new Thread(() -> {
+        EJECUTOR_AUDIO.execute(() -> {
             try {
-                InputStream recursoAudio = AudioServicio.class.getResourceAsStream("/audio/click.wav");
-                if (recursoAudio == null) {
+                URL rutaAudio = AudioServicio.class.getResource("/audio/click.wav");
+                if (rutaAudio == null) {
                     return;
                 }
-                try (InputStream flujoArchivo = recursoAudio;
-                     AudioInputStream flujoAudio = AudioSystem.getAudioInputStream(flujoArchivo)) {
+                try (AudioInputStream flujoAudio = AudioSystem.getAudioInputStream(rutaAudio)) {
                     Clip clip = AudioSystem.getClip();
                     clip.open(flujoAudio);
                     clip.start();
                 }
-            } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
-                ex.printStackTrace();
+            } catch (Exception ex) {
+                System.err.println("No se pudo cargar audio click.wav: " + ex.getMessage());
             }
-        }, "audio-click-boton");
-        hilo.setDaemon(true);
-        hilo.start();
+        });
     }
 }

@@ -43,8 +43,8 @@ public final class TemaVisual {
     }
 
     private static void aplicarPaletaClara() {
-        Color fondoBoton = new Color(0x173864);
-        Color hoverBoton = fondoBoton.brighter();
+        Color fondoBoton = AZUL_INSTITUCIONAL;
+        Color hoverBoton = AZUL_SUAVE;
         UIManager.put("Panel.background", GRIS_CLARO);
         UIManager.put("Viewport.background", GRIS_CLARO);
         UIManager.put("Label.foreground", AZUL_INSTITUCIONAL);
@@ -53,18 +53,25 @@ public final class TemaVisual {
         UIManager.put("TableHeader.background", AZUL_INSTITUCIONAL);
         UIManager.put("TableHeader.foreground", GRIS_CLARO);
         UIManager.put("Button.background", fondoBoton);
-        UIManager.put("Button.hoverBackground", hoverBoton);
-        UIManager.put("Button.focusedBackground", fondoBoton);
         UIManager.put("Button.foreground", GRIS_CLARO);
+        UIManager.put("Button.hoverBackground", hoverBoton);
+        UIManager.put("Button.pressedBackground", fondoBoton);
+        UIManager.put("Button.focusedBackground", fondoBoton);
+        UIManager.put("Button.focusedForeground", GRIS_CLARO);
+        UIManager.put("Button.disabledBackground", AZUL_SUAVE);
+        UIManager.put("Button.disabledText", GRIS_CLARO);
         UIManager.put("Button.default.background", fondoBoton);
         UIManager.put("Button.default.foreground", GRIS_CLARO);
+        UIManager.put("Button.default.hoverBackground", hoverBoton);
+        UIManager.put("Button.default.pressedBackground", fondoBoton);
+        UIManager.put("Button.default.focusedBackground", fondoBoton);
         UIManager.put("Component.borderColor", AZUL_SUAVE);
         UIManager.put("Separator.foreground", AZUL_SUAVE);
     }
 
     private static void aplicarPaletaOscura() {
-        Color fondoBoton = new Color(0x173864);
-        Color hoverBoton = fondoBoton.brighter();
+        Color fondoBoton = AZUL_INSTITUCIONAL;
+        Color hoverBoton = AZUL_SUAVE;
         UIManager.put("Panel.background", FONDO_OSCURO);
         UIManager.put("Viewport.background", FONDO_OSCURO);
         UIManager.put("Label.foreground", GRIS_CLARO);
@@ -73,11 +80,18 @@ public final class TemaVisual {
         UIManager.put("TableHeader.background", PANEL_OSCURO_SECUNDARIO);
         UIManager.put("TableHeader.foreground", GRIS_CLARO);
         UIManager.put("Button.background", fondoBoton);
-        UIManager.put("Button.hoverBackground", hoverBoton);
-        UIManager.put("Button.focusedBackground", fondoBoton);
         UIManager.put("Button.foreground", GRIS_CLARO);
+        UIManager.put("Button.hoverBackground", hoverBoton);
+        UIManager.put("Button.pressedBackground", fondoBoton);
+        UIManager.put("Button.focusedBackground", fondoBoton);
+        UIManager.put("Button.focusedForeground", GRIS_CLARO);
+        UIManager.put("Button.disabledBackground", AZUL_SUAVE);
+        UIManager.put("Button.disabledText", GRIS_CLARO);
         UIManager.put("Button.default.background", fondoBoton);
         UIManager.put("Button.default.foreground", GRIS_CLARO);
+        UIManager.put("Button.default.hoverBackground", hoverBoton);
+        UIManager.put("Button.default.pressedBackground", fondoBoton);
+        UIManager.put("Button.default.focusedBackground", fondoBoton);
         UIManager.put("Component.borderColor", new Color(180, 199, 217, 140));
         UIManager.put("Separator.foreground", new Color(180, 199, 217, 120));
     }
