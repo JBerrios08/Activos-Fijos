@@ -1,5 +1,6 @@
 package com.activosfijos.componentes;
 
+import com.activosfijos.servicio.AudioServicio;
 import com.activosfijos.util.TemaVisual;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
@@ -23,17 +24,7 @@ public final class ComponentesFabrica {
         boton.setBackground(UIManager.getColor("Button.default.background") != null ? UIManager.getColor("Button.default.background") : TemaVisual.AZUL_INSTITUCIONAL);
         boton.setForeground(UIManager.getColor("Button.default.foreground") != null ? UIManager.getColor("Button.default.foreground") : TemaVisual.GRIS_CLARO);
         boton.setBorder(new BordeRedondeado(12));
-        boton.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseEntered(java.awt.event.MouseEvent e) {
-                boton.setBackground(UIManager.getColor("Button.background") != null ? UIManager.getColor("Button.background") : TemaVisual.AZUL_SUAVE);
-            }
-
-            @Override
-            public void mouseExited(java.awt.event.MouseEvent e) {
-                boton.setBackground(UIManager.getColor("Button.default.background") != null ? UIManager.getColor("Button.default.background") : TemaVisual.AZUL_INSTITUCIONAL);
-            }
-        });
+        boton.addActionListener(e -> AudioServicio.reproducirClick());
         return boton;
     }
 
@@ -41,22 +32,12 @@ public final class ComponentesFabrica {
         JButton boton = new JButton(texto);
         boton.setContentAreaFilled(true);
         boton.setOpaque(true);
-        boton.setBackground(UIManager.getColor("Button.background") != null ? UIManager.getColor("Button.background") : TemaVisual.AZUL_SUAVE);
-        boton.setForeground(UIManager.getColor("Button.foreground") != null ? UIManager.getColor("Button.foreground") : TemaVisual.AZUL_INSTITUCIONAL);
+        boton.setBackground(UIManager.getColor("Button.background") != null ? UIManager.getColor("Button.background") : TemaVisual.AZUL_INSTITUCIONAL);
+        boton.setForeground(UIManager.getColor("Button.foreground") != null ? UIManager.getColor("Button.foreground") : TemaVisual.GRIS_CLARO);
         boton.setFocusPainted(false);
         boton.setFont(new Font("Segoe UI", Font.BOLD, 15));
         boton.setBorder(new BordeRedondeado(12));
-        boton.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseEntered(java.awt.event.MouseEvent e) {
-                boton.setBackground(UIManager.getColor("Button.default.background") != null ? UIManager.getColor("Button.default.background") : TemaVisual.AZUL_INSTITUCIONAL);
-            }
-
-            @Override
-            public void mouseExited(java.awt.event.MouseEvent e) {
-                boton.setBackground(UIManager.getColor("Button.background") != null ? UIManager.getColor("Button.background") : TemaVisual.AZUL_SUAVE);
-            }
-        });
+        boton.addActionListener(e -> AudioServicio.reproducirClick());
         return boton;
     }
 
@@ -80,6 +61,7 @@ public final class ComponentesFabrica {
         boton.setForeground(TemaVisual.AZUL_INSTITUCIONAL);
         boton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         boton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        boton.addActionListener(e -> AudioServicio.reproducirClick());
         return boton;
     }
 
