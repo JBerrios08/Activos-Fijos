@@ -1,5 +1,6 @@
 package com.activosfijos.vista;
 
+import com.activosfijos.servicio.AudioServicio;
 import com.activosfijos.servicio.EstadosServicio;
 import com.activosfijos.servicio.GraficosServicio;
 import com.activosfijos.util.TemaVisual;
@@ -16,6 +17,7 @@ import java.util.Map;
 public class MenuPrincipal extends JFrame {
     private boolean modoOscuro;
     private final EstadosServicio estadosServicio = new EstadosServicio();
+    private final JLabel etiquetaLogo = new JLabel();
     private final GraficosServicio graficosServicio = new GraficosServicio();
 
     public MenuPrincipal(String usuario, String rol) {
@@ -31,6 +33,9 @@ public class MenuPrincipal extends JFrame {
         cabecera.setBackground(TemaVisual.AZUL_INSTITUCIONAL);
         cabecera.setBorder(new EmptyBorder(12, 16, 12, 16));
 
+        JPanel panelIzquierdaCabecera = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        panelIzquierdaCabecera.setOpaque(false);
+        actualizarLogoPorTema();
         JLabel bienvenida = new JLabel(" Usuario: " + usuario + "  |  Rol: " + rol);
         bienvenida.setForeground(UIManager.getColor("Label.foreground"));
 
@@ -48,7 +53,9 @@ public class MenuPrincipal extends JFrame {
         panelDerechaCabecera.add(botonBackup);
         panelDerechaCabecera.add(botonSalir);
 
-        cabecera.add(bienvenida, BorderLayout.WEST);
+        panelIzquierdaCabecera.add(etiquetaLogo);
+        panelIzquierdaCabecera.add(bienvenida);
+        cabecera.add(panelIzquierdaCabecera, BorderLayout.WEST);
         cabecera.add(panelDerechaCabecera, BorderLayout.EAST);
 
         JPanel centro = new JPanel(new BorderLayout(20, 20));
@@ -93,6 +100,7 @@ public class MenuPrincipal extends JFrame {
             for (Window ventana : Window.getWindows()) {
                 SwingUtilities.updateComponentTreeUI(ventana);
             }
+            actualizarLogoPorTema();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "No fue posible cambiar el tema: " + ex.getMessage());
         }
@@ -118,6 +126,7 @@ public class MenuPrincipal extends JFrame {
         boton.setBackground(UIManager.getColor("Button.background"));
         boton.setForeground(UIManager.getColor("Button.foreground"));
         boton.setBorder(new RoundedBorder(12));
+        boton.addActionListener(e -> AudioServicio.reproducirClick());
         return boton;
     }
 
@@ -128,7 +137,15 @@ public class MenuPrincipal extends JFrame {
         boton.setBackground(UIManager.getColor("Button.default.background"));
         boton.setForeground(UIManager.getColor("Button.default.foreground"));
         boton.setBorder(new RoundedBorder(12));
+        boton.addActionListener(e -> AudioServicio.reproducirClick());
         return boton;
+    }
+
+
+    private void actualizarLogoPorTema() {
+        ImageIcon icono = new ImageIcon(getClass().getResource(TemaVisual.rutaLogoSegunTema()));
+        Image escalada = icono.getImage().getScaledInstance(150, 46, Image.SCALE_SMOOTH);
+        etiquetaLogo.setIcon(new ImageIcon(escalada));
     }
 
     private void cerrarSesion() {

@@ -12,6 +12,7 @@ public class FormularioLogin extends JFrame {
     private final JTextField campoUsuario;
     private final JPasswordField campoClave;
     private final AutenticacionServicio autenticacionServicio = new AutenticacionServicio();
+    private final JLabel etiquetaLogo = new JLabel();
 
     public FormularioLogin() {
         setTitle("Activos Fijos - Inicio de Sesión");
@@ -23,6 +24,7 @@ public class FormularioLogin extends JFrame {
         campoUsuario = ComponentesFabrica.crearCampoTexto(20);
         campoClave = ComponentesFabrica.crearCampoClave(20);
         setContentPane(crearContenedorPrincipal());
+        actualizarLogoPorTema();
     }
 
     private JPanel crearContenedorPrincipal() {
@@ -37,11 +39,14 @@ public class FormularioLogin extends JFrame {
         barraLateral.setBackground(TemaVisual.AZUL_INSTITUCIONAL);
         barraLateral.setPreferredSize(new Dimension(280, 650));
         barraLateral.setLayout(new BoxLayout(barraLateral, BoxLayout.Y_AXIS));
-        barraLateral.setBorder(new EmptyBorder(80, 24, 24, 24));
+        barraLateral.setBorder(new EmptyBorder(50, 24, 24, 24));
+        etiquetaLogo.setAlignmentX(Component.LEFT_ALIGNMENT);
+        barraLateral.add(etiquetaLogo);
+        barraLateral.add(Box.createVerticalStrut(24));
         barraLateral.add(ComponentesFabrica.crearTituloSeccion("ACTIVOS-FIJOS", 30, TemaVisual.GRIS_CLARO));
         barraLateral.add(Box.createVerticalStrut(10));
         barraLateral.add(ComponentesFabrica.crearEtiquetaFormulario("Control moderno de inventario"));
-        barraLateral.getComponent(2).setForeground(TemaVisual.GRIS_CLARO);
+        barraLateral.getComponent(4).setForeground(TemaVisual.GRIS_CLARO);
         return barraLateral;
     }
 
@@ -67,6 +72,12 @@ public class FormularioLogin extends JFrame {
 
         panelLogin.add(formulario);
         return panelLogin;
+    }
+
+    private void actualizarLogoPorTema() {
+        ImageIcon icono = new ImageIcon(getClass().getResource(TemaVisual.rutaLogoSegunTema()));
+        Image escalada = icono.getImage().getScaledInstance(210, 70, Image.SCALE_SMOOTH);
+        etiquetaLogo.setIcon(new ImageIcon(escalada));
     }
 
     private void iniciarSesion() {
