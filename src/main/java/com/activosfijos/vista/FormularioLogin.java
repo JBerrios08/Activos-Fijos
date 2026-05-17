@@ -50,7 +50,7 @@ public class FormularioLogin extends JFrame {
         titulo.setAlignmentX(Component.CENTER_ALIGNMENT);
         barraLateral.add(titulo);
         barraLateral.add(Box.createVerticalStrut(10));
-        JLabel subtitulo = ComponentesFabrica.crearEtiquetaFormulario("Control moderno de inventario");
+        JLabel subtitulo = ComponentesFabrica.crearEtiquetaFormulario("Control de inventario UNAB");
         subtitulo.setForeground(TemaVisual.GRIS_CLARO);
         subtitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
         barraLateral.add(subtitulo);
